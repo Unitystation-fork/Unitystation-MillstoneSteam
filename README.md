@@ -1,7 +1,10 @@
 # Unitystation-MillstoneSteam
 Objectif Stream coop
 
-
+# Technical stack informations
+Nuxtjs (fullstack web framework)
+SQLite (light relationnal database)
+Prisma (ORM)
 ## Setup
 
 Make sure to install the dependencies:
