@@ -1,25 +1,32 @@
 <template>
-  <div>
-    <NuxtWelcome />
+  <div class="body">
+    <Header @login="show" />
+    <LoginForm
+      :show-form="showForm"
+      @close="closeForm"
+      @close-form="closeForm"
+    />
   </div>
 </template>
 
 <script setup>
-const user = await fetch("http://localhost:3000/api/user").then((res) =>
-  res.json().catch((err) => console.log(err))
-);
+const showForm = ref(false);
+const show = () => {
+  showForm.value = true;
+};
 
-const postUser = await fetch("http://localhost:3000/api/user", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    name: "John Doe",
-    password: "123456",
-  }),
-}).then((res) => res.json().catch((err) => console.log(err)));
-
-console.log(user);
-console.log(postUser);
+const closeForm = () => {
+  showForm.value = false;
+};
 </script>
+
+<style>
+* {
+  font-family: "Ubuntu", sans-serif;
+  color: white;
+}
+body {
+  min-height: 100vh;
+  background-color: #171e27;
+}
+</style>
