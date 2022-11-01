@@ -16,6 +16,12 @@
 
 <script setup lang="ts">
 const isLogged = ref(false);
+if (
+  localStorage.getItem("isLogged") !== null &&
+  localStorage.getItem("isLogged") === "true"
+) {
+  isLogged.value = true;
+}
 
 const logout = () => {
   localStorage.removeItem("isLogged");

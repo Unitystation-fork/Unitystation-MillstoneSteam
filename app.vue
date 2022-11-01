@@ -1,21 +1,19 @@
 <template>
   <div class="body">
-    <Header @login="show" />
-    <LoginForm
-      :show-form="showForm"
-      @close="closeForm"
-      @close-form="closeForm"
-    />
+    <Header @login="show" :key="headerKey" />
+    <LoginForm :show-form="showForm" @close="closeForm" />
   </div>
 </template>
 
 <script setup>
 const showForm = ref(false);
+const headerKey = ref(0);
 const show = () => {
   showForm.value = true;
 };
 
 const closeForm = () => {
+  headerKey.value += 1;
   showForm.value = false;
 };
 </script>
