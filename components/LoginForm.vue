@@ -39,10 +39,13 @@
 </template>
 
 <script setup>
+import { useJwtStore } from "~~/stores/jwt";
+
 const username = ref("");
 const password = ref("");
 const error = ref("");
 const emit = defineEmits(["close"]);
+const jwtStore = useJwtStore();
 
 defineProps({
   showForm: {
@@ -76,7 +79,7 @@ const login = async () => {
       console.log(e);
     });
   if (res.statusCode === 200) {
-    localStorage.setItem("isLogged", "true");
+    jwtStore.setJwt(res.body.token);
     console.log("Logged in");
     emit("close");
   }

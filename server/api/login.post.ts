@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import {PrismaClient} from '@prisma/client';
 const prisma = new PrismaClient();
+import jwt from 'jsonwebtoken';
 
 
 const login = defineEventHandler(async (event) => {
@@ -23,9 +24,18 @@ const login = defineEventHandler(async (event) => {
             body: JSON.stringify({message: 'Password is incorrect'}),
         };
     }
+    const token = jwt.sign({id: user.id}, "shhhhhhh", {expiresIn : "5h"});
+    await prisma.user.update({
+        where: {
+            id: user.id,
+        },
+        data: {
+           token
+        },
+    });
     return {
         statusCode: 200,
-        body: JSON.stringify({message: 'Login successful'}),
+        body: {message: 'Login successful', token: token},
     };
 });
 

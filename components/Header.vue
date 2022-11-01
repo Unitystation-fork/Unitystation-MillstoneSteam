@@ -7,27 +7,22 @@
       />
       <h1>Bienvenue sur le projet milestone !</h1>
       <div class="btns">
-        <button v-if="!isLogged" @click="$emit('login')">Login</button>
-        <button v-if="isLogged" @click="logout">Logout</button>
+        <button v-if="!jwtStore.jwt" @click="$emit('login')">Login</button>
+        <button v-if="jwtStore.jwt" @click="logout">Logout</button>
       </div>
     </header>
   </div>
 </template>
 
 <script setup lang="ts">
-const isLogged = ref(false);
-if (typeof window !== "undefined") {
-  if (localStorage.getItem("isLogged") === "true") {
-    isLogged.value = true;
-  }
-}
+import { useJwtStore } from "~/stores/jwt";
 
-const logout = () => {
-  if (typeof window !== "undefined") {
-    localStorage.removeItem("isLogged");
-  }
-  isLogged.value = false;
-};
+const jwtStore = useJwtStore();
+
+function logout() {
+  jwtStore.setJwt(null);
+  console.log(jwtStore.jwt);
+}
 
 const emit = defineEmits(["login"]);
 </script>
