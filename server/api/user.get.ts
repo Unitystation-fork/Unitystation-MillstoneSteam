@@ -3,6 +3,7 @@ const prisma = new PrismaClient();
 
 const users = defineEventHandler(async (event) => {
 try {
+  // get all users from the database and return them
   const users = await prisma.user.findMany({});
   return {
     statusCode: 200,
@@ -11,7 +12,7 @@ try {
 } catch (error) {
   return {
     statusCode: 500,
-    body: JSON.stringify({ message: "User could not be found" }),
+    body: { message: "User could not be found", error: error },
   }
 }
   
