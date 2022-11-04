@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import bcrypt from "bcrypt";
 const prisma = new PrismaClient();
 
@@ -7,22 +8,45 @@ const createUser = defineEventHandler(async (event) => {
   const body = await readBody(event);
   const name = body.name;
   const password = await bcrypt.hash(body.password, 10);
+  const auth = event.req.headers.authorization;
+  const token = (auth !== undefined) ?  auth.split(" ")[1] : null;
 try {
+  // verify the token validity
+  if (!token) {
+    throw "No token provided";
+  }
+  const decoded: string | JwtPayload = jwt.verify(token, "shhhhhhh");
+  if (!decoded) {
+    throw "Invalid token";
+  }
+  // check if the user exists and throw an error if it doesn't
+  const user = await prisma.user.findUnique({
+    where: {
+      id: decoded.id,
+    }
+  });
+  if (!user) {
+    throw "User not found";
+  }
+  //check if user is admin
+  if (user.role !== "ADMIN") {
+    throw "You do not have the permission to create users";
+  }
   // check required infos are present
   if(!name || !password) {
     throw "Name or password missing";
   }
   // check if user already exists
-  const user = await prisma.user.findUnique({
+  const userToCreate = await prisma.user.findUnique({
     where: {
       name: name, 
     }
   });
-  if(user) {
+  if(userToCreate) {
     throw "User already exists";
   }
     // create the user with provided name and password
-  await prisma.user.create({
+  const createdUser = await prisma.user.create({
     data: {
       name: name,
       password: password,
@@ -30,7 +54,7 @@ try {
   });
   return {
     statusCode: 200,
-    body: JSON.stringify("User created"),
+    body: {message: "User created", user : createdUser },
   };
 } catch (error) {
   return {

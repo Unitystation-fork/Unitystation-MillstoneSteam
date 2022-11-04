@@ -7,7 +7,7 @@ try {
   const users = await prisma.user.findMany({});
   return {
     statusCode: 200,
-    body: JSON.stringify(users),
+    body: {users},
   };
 } catch (error) {
   return {
