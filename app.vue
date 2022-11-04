@@ -2,8 +2,10 @@
   <div class="body">
     <Header @login="show" />
     <LoginForm :show-form="showForm" @close="closeForm" />
+    <Taches />
   </div>
 </template>
+
 
 <script setup>
 const showForm = ref(false);
@@ -26,3 +28,6 @@ body {
   background-color: #171e27;
 }
 </style>
+
+
+ 

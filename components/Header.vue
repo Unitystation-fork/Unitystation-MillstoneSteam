@@ -13,7 +13,7 @@
     </header>
   </div>
 </template>
-
+ 
 <script setup lang="ts">
 import { useJwtStore } from "~/stores/jwt";
 
