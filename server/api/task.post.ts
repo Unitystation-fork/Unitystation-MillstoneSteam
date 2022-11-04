@@ -8,7 +8,8 @@ const createTask = defineEventHandler(async (event) => {
   const title = body.title;
   const content = body.content;
   // get the token from the request headers
-  const token = event.req.headers.authorization.split(" ")[1];
+  const auth = event.req.headers.authorization;
+  const token = (auth !== undefined) ?  auth.split(" ")[1] : null;
   try {
     // verify the token and get the user id from it
     if(!token) {
@@ -25,7 +26,11 @@ const createTask = defineEventHandler(async (event) => {
         }
     });
     if(!user) {
-        throw "You do not have permission to create a task";
+        throw "User not found";
+    }
+    //check if user is admin
+    if(user.role !== "ADMIN") {
+        throw "You do not have the permission to create tasks";
     }
     // create the task
     const task = await prisma.task.create({

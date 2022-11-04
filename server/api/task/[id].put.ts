@@ -7,16 +7,17 @@ const editTask = defineEventHandler(async (event) => {
   const id = parseInt(event.context.params.id);
   // get the body of the request and asign its parameters to variables
   const body = await readBody(event);
-  const title = body.title;
-  const content = body.content;
-  const completed = body.completed;
+  const title = (body.title) ? body.title : null;
+  const content = (body.content) ? body.content : null;
+  const completed = (body.completed) ? body.completed : null;
 
   //get the token from the request headers
-  const token = event.req.headers.authorization.split(" ")[1];
+  const auth = event.req.headers.authorization;
+  const token = (auth !== undefined) ?  auth.split(" ")[1] : null;
   try {
     //check if task id is given
     if (!id) {
-        throw "No id provided";
+      throw "No id provided";
     }
     // verify the token and get the user id from it
     if (!token) {
@@ -33,35 +34,40 @@ const editTask = defineEventHandler(async (event) => {
       },
     });
     if (!user) {
-      throw "You do not have permission to create a task";
+      throw "User not found";
+    }
+    //check if user is admin
+    if (user.role !== "ADMIN") {
+      throw "You do not have the permission to edit tasks";
     }
     // check if the task exists and throw an error if it doesn't
     const task = await prisma.task.findUnique({
-        where: {
-            id: id,
-        }
+      where: {
+        id: id,
+      },
     });
-    if(!task) {
-        throw "Task does not exist";
+    if (!task) {
+      throw "Task does not exist";
     }
-    // update the task
+    // update the task with infos from the request body if they are not null
+    // if they are null, the task will be updated with actual values
     const updatedTask = await prisma.task.update({
-        where: {
-            id: id,
-        },
-        data: {
-            title,
-            content,
-            completed,
-            updatedAt: new Date(),
-        }
+      where: {
+        id: id,
+      },
+      data: {
+        title : (title) ? title : task.title,
+        content : (content) ? content : task.content,
+        completed : (completed) ? completed : task.completed,
+        updatedAt: new Date(),
+      },
     });
     return {
-        statusCode: 200,
-        body: {message: "Task updated", task: updatedTask},
-    }
+      statusCode: 200,
+      body: { message: "Task updated", task: updatedTask },
+    };
   } catch (e) {
-    console.log(e)
+    console.log(e);
     return {
       statusCode: 500,
       body: { message: "Task could not be edited", error: e },

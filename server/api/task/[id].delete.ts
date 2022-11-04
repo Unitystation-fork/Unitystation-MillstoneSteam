@@ -4,7 +4,8 @@ const prisma = new PrismaClient();
 
 const deleteTask = defineEventHandler(async (event) => {
     const id = parseInt(event.context.params.id);
-    const token = event.req.headers.authorization.split(" ")[1];
+    const auth = event.req.headers.authorization;
+    const token = (auth !== undefined) ?  auth.split(" ")[1] : null;
     try{
         //check if id is given
         if(!id) {
@@ -25,7 +26,11 @@ const deleteTask = defineEventHandler(async (event) => {
             }
         });
         if (!user) {
-            throw "You do not have permission to delete a task";
+            throw "User not found";
+        }
+        //check if user is admin 
+        if (user.role !== "ADMIN") {
+            throw "You do not have the permission to delete tasks";
         }
         // check if the task exists and throw an error if it doesn't
         const task = await prisma.task.findUnique({
