@@ -55,13 +55,10 @@ defineProps({
 });
 
 const login = async () => {
-  console.log("popopopopopoooooooooo");
   if (username.value.length === 0 || password.value.length === 0) {
-    console.log("pipi");
     error.value = "Veuillez remplir tous les champs";
     return;
   }
-  console.log("pipi2");
 
   const res = await fetch("http://localhost:3000/api/login", {
     method: "POST",
