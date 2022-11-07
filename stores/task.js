@@ -20,5 +20,7 @@ export const useTaskStore = defineStore("tasks", {
             }
         },
     },
+
     persist:true,
+
 });

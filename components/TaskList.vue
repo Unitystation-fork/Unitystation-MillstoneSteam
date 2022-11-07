@@ -1,6 +1,8 @@
 <template>
   <div>
+
     <h2 v-if="tasks.length > 0" v-for="task in tasks" id="tasks" v-bind="task" :key="task.id">
+
       {{ task.title }}
     </h2>
     <h2 v-else>No tasks</h2>
@@ -13,11 +15,6 @@ const tasks = ref([]);
 const taskStore = useTaskStore();
 
 onMounted(async () => {
-  await taskStore.setTasks();
-  tasks.value = taskStore.tasks;
-});
-
-onUpdated(async () => {
   await taskStore.setTasks();
   tasks.value = taskStore.tasks;
 });

@@ -3,7 +3,9 @@
     <Header @login="show" />
     <LoginForm :show-form="showForm" @close="closeForm" />
     <TaskList />
+
     <AddTaskForm :key="Key"/>
+
   </div>
 </template>
 
