@@ -3,14 +3,13 @@
     <Header @login="show" />
     <LoginForm :show-form="showForm" @close="closeForm" />
     <TaskList />
-
-    <AddTaskForm :key="Key"/>
-
+    <AddTaskForm />
   </div>
 </template>
 
 <script setup>
 const showForm = ref(false);
+const listKey = ref(0);
 const show = () => {
   showForm.value = true;
 };

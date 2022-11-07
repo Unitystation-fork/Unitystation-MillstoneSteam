@@ -1,43 +1,37 @@
 <template>
-
-<form method="POST" @submit.prevent="addTask">  
-
-    <input class="colorText" type="text" v-model="title"/>
-    <input class="colorText" type="text" v-model="content"/>
-    <input class="colorText" type="submit" value="Submit"/>
-    <p v-if="error!==''">{{error}}</p>
-
-</form>
+  <form method="POST" @submit.prevent="addTask">
+    <input class="colorText" type="text" v-model="title" />
+    <input class="colorText" type="text" v-model="content" />
+    <input class="colorText" type="submit" value="Submit" />
+    <p v-if="error !== ''">{{ error }}</p>
+  </form>
 </template>
 
-
 <script setup>
-import { useJwtStore } from '~~/stores/jwt';
-import { useTaskStore } from '~~/stores/task';
-
+import { useJwtStore } from "~~/stores/jwt";
+import { useTaskStore } from "~~/stores/task";
 
 const title = ref("");
 const content = ref("");
 const jwtStore = useJwtStore();
 const error = ref("");
 const taskStore = useTaskStore();
-const emit = defineEmits(["updateTasks"]);
 
-async function addTask (){
-    console.log(title.value, content.value)
+async function addTask() {
+  console.log(title.value, content.value);
 
-    if (title.value.length === 0 || content.value.length === 0) {
+  if (title.value.length === 0 || content.value.length === 0) {
     error.value = "Veuillez remplir tous les champs";
-    console.log('1')
+    console.log("1");
     return;
   }
-  console.log('2')
-  if(jwtStore.jwt === null){
+  console.log("2");
+  if (jwtStore.jwt === null) {
     error.value = "Veuillez vous connecter";
-    console.log('3')
+    console.log("3");
     return;
   }
-  console.log('4')
+  console.log("4");
 
   const res = await fetch("http://localhost:3000/api/task", {
     method: "POST",
@@ -56,29 +50,17 @@ async function addTask (){
       error.value = e.body.message;
       console.log(e);
     });
-    console.log('5')
-    console.log(res)
   if (res.statusCode === 200) {
     console.log("Task Added");
-    taskStore.$reset();  //Reinitialise le strore à sa valeur de déclaration (ici tableau vide)
-    emit("updateTasks")
+    taskStore.$reset();
+    window.location.reload();
   }
   error.value = res.body.message;
-
 }
-
-
 </script>
 
-
-
-
-
-
 <style>
-
-.colorText{
-    color: black;
+.colorText {
+  color: black;
 }
-
 </style>
