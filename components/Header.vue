@@ -1,19 +1,17 @@
 <template>
-  <div>
-    <header>
-      <img
-        src="@/assets/img/305474881_500277108772915_4425958856109240367_n.jpg"
-        alt="twitch"
-      />
-      <h1>Bienvenue sur le projet milestone !</h1>
-      <div class="btns">
-        <button v-if="!jwtStore.jwt" @click="$emit('login')">Login</button>
-        <button v-if="jwtStore.jwt" @click="logout">Logout</button>
-      </div>
-    </header>
-  </div>
+  <header>
+    <img
+      src="@/assets/img/305474881_500277108772915_4425958856109240367_n.jpg"
+      alt="twitch"
+    />
+    <h1>Bienvenue sur le projet milestone !</h1>
+    <div class="btns">
+      <button v-if="!jwtStore.jwt" @click="$emit('login')">Login</button>
+      <button v-if="jwtStore.jwt" @click="logout">Logout</button>
+    </div>
+  </header>
 </template>
- 
+
 <script setup lang="ts">
 import { useJwtStore } from "~/stores/jwt";
 
@@ -23,8 +21,6 @@ function logout() {
   jwtStore.setJwt(null);
   console.log(jwtStore.jwt);
 }
-
-const emit = defineEmits(["login"]);
 </script>
 
 <style scoped>
