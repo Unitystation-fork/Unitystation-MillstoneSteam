@@ -80,6 +80,7 @@ const login = async () => {
     });
   if (res.statusCode === 200) {
     jwtStore.setJwt(res.body.token);
+    jwtStore.setRole(res.body.role);
     console.log("Logged in");
     emit("close");
   }
