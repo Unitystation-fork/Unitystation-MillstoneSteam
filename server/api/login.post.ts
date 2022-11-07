@@ -44,7 +44,7 @@ const login = defineEventHandler(async (event) => {
     // return the token
     return {
         statusCode: 200,
-        body: {message: 'Login successful', token: token},
+        body: {message: 'Login successful', token: token, role : user.role},
     };
 });
 
