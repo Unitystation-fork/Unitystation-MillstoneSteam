@@ -6,7 +6,7 @@ const getTasks = defineEventHandler(async (event) => {
         const tasks = await prisma.task.findMany({});
         return {
             statusCode: 200,
-            body: JSON.stringify(tasks),
+            body: {tasks},
         };
     }catch(error){
         return {
