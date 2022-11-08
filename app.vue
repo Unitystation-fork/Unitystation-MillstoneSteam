@@ -27,5 +27,6 @@ const closeForm = () => {
 body {
   min-height: 100vh;
   background-color: #171e27;
+
 }
 </style>

@@ -1,10 +1,12 @@
 <template>
-  <form method="POST" @submit.prevent="addTask">
-    <input class="colorText" type="text" v-model="title" />
-    <input class="colorText" type="text" v-model="content" />
-    <input class="colorText" type="submit" value="Submit" />
-    <p v-if="error !== ''">{{ error }}</p>
-  </form>
+    <div class="bodydy">
+        <form method="POST" @submit.prevent="addTask">
+            <input class="colorText" type="text" v-model="title" />
+            <input class="colorText" type="text" v-model="content" />
+            <input class="colorText" type="submit" value="Submit" />
+            <p v-if="error !== ''">{{ error }}</p>
+        </form>
+    </div>
 </template>
 
 <script setup>
@@ -53,7 +55,7 @@ async function addTask() {
   if (res.statusCode === 200) {
     console.log("Task Added");
     taskStore.$reset();
-    window.location.reload();
+    window.location.reload();   //f5 automatique
   }
   error.value = res.body.message;
 }
@@ -62,5 +64,11 @@ async function addTask() {
 <style>
 .colorText {
   color: black;
+  margin: 10px;
+}
+
+.bodydy{
+    display: flex;
+    justify-content: center;
 }
 </style>

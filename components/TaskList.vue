@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <h2
+  <div class="body">
+    <h2 class="tasks"
       v-if="tasks.length > 0"
       v-for="task in tasks"
       id="tasks"
@@ -25,19 +25,31 @@ onMounted(async () => {
 </script>
 
 <style>
+
+.body{
+
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 75px;
+  padding: 10px;
+
+}
+
+.tasks{
+
+  height: 25px;
+  margin-top: 5px;
+}
+
 #tasks {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  border: 1px solid black;
   margin-top: 200px;
   padding: 10px;
 }
-.space {
-  margin-right: 50px;
-}
 
-.colorBlack {
-  color: black;
-}
 </style>
