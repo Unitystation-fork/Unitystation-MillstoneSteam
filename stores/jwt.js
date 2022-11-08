@@ -17,6 +17,11 @@ export const useJwtStore = defineStore("jwt", {
     setRole(role) {
       this.role = role;
     },
+    logout(){  
+      this.jwt = null;
+      this.role = "";
+    }
+  
   },
   persist: true,
 });

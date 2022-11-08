@@ -7,7 +7,7 @@
     <h1>Bienvenue sur le projet milestone !</h1>
     <div class="btns">
       <button v-if="!jwtStore.jwt" @click="$emit('login')">Login</button>
-      <button v-if="jwtStore.jwt" @click="logout">Logout</button>
+      <button v-if="jwtStore.jwt" @click="jwtStore.logout()">Logout</button>
     </div>
   </header>
 </template>
@@ -17,10 +17,6 @@ import { useJwtStore } from "~/stores/jwt";
 
 const jwtStore = useJwtStore();
 
-function logout() {
-  jwtStore.setJwt(null);
-  console.log(jwtStore.jwt);
-}
 </script>
 
 <style scoped>

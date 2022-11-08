@@ -1,5 +1,5 @@
 <template>
-  <div class="bodydy">
+  <div class="bodydy" v-if="jwtStore.role=='ADMIN'">
     <form method="POST" @submit.prevent="addTask">
       <input class="colorText" type="text" v-model="title" />
       <input class="colorText" type="text" v-model="content" />
