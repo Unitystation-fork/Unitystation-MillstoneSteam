@@ -39,7 +39,7 @@ async function addTask() {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: "Bearer " + jwtStore.jwt,
+      "Authorization": "Bearer " + jwtStore.jwt,
     },
 
     body: JSON.stringify({

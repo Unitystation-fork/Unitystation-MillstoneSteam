@@ -4,6 +4,7 @@ const prisma = new PrismaClient();
 const getTasks = defineEventHandler(async (event) => {
     try{
         const tasks = await prisma.task.findMany({});
+        console.log(tasks);
         return {
             statusCode: 200,
             body: {tasks},
