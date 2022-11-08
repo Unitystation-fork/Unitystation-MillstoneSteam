@@ -4,43 +4,35 @@
       <h2>
         {{ task.title }}
       </h2>
-      <ModifTask :id="3" :title="'A'" :content="'B'" :completed="true"/> 
+      <ModifTask v-bind="task" />
       <button class="btn" @click="deleteTask(task.id)" v-if="jwtStore.role=='ADMIN'">X Supprimer</button>
     </div>
     <h2 v-if="tasks?.length === 0">No tasks</h2>
-    
+
   </div>
 </template>
 
 <script setup>
 import { useTaskStore } from "~/stores/task"
-import { useJwtStore } from "~~/stores/jwt";
+import { useJwtStore } from "~~/stores/jwt"
 
 const taskStore = useTaskStore()
 await taskStore.setTasks()
 const jwtStore = useJwtStore()
 
-
-
-async function deleteTask(id){
-  const res = await fetch("http://localhost:3000/api/task/" + id,{ //await fait attendre que toute la fonction soit déroulée
-    headers:{
+async function deleteTask(id) {
+  const res = await fetch("http://localhost:3000/api/task/" + id, { //await fait attendre que toute la fonction soit déroulée
+    headers: {
       "Authorization": "Bearer " + jwtStore.jwt
     },
-
-    method : "DELETE",
+    method: "DELETE",
   })
     .then(r => r.json())
-    .catch(e => console.log("error", e));
-
-  if(res.statusCode === 200){
-
+    .catch(e => console.log("error", e))
+  if (res.statusCode === 200) {
     await taskStore.setTasks()
   }
 }
-
-
-
 </script>
 
 <style>
@@ -56,7 +48,7 @@ async function deleteTask(id){
 
 }
 
-.btn{
+.btn {
   margin-left: 15px;
 }
 
