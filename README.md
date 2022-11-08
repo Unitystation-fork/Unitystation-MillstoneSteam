@@ -170,4 +170,3 @@ cd /xxxx
 - :discord: De-Briefing
 
 -------------
-
