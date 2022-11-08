@@ -5,6 +5,27 @@ Objectif Stream coop
 
 [TOC]
 
+```properties
+OnePage MillstoneSteam
+├── Langages utilisés
+├── Description du projet
+├── Credit , participant, organisation
+├── But du projet / public cible
+│	 ├── Mode Viewer
+│	 └── Mode Admin
+├── Installation
+│	 ├── Dépendances
+│	 ├── Démarrez ensuite le serveur de développement :
+│	 └── PROD
+├── Mise à jour
+├── Usage
+│	 ├── Options pour le ou les admins :
+│	 └── Options pour les autres utilisateurs :
+└── ToDo
+	 ├── Prototype visuel
+	 └── Liste des taches
+```
+
 ### Langages utilisés
 
 - Le projet fonctionne avec le framework fullstack [NuxtJs](https://v3.nuxtjs.org/) + l'ORM [Prisma](https://www.prisma.io/) + une base de données en SQLite
