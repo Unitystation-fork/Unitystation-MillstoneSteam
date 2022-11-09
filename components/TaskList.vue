@@ -4,8 +4,11 @@
       <h2>
         {{ task.title }}
       </h2>
+      <p class="space">
+        {{ task.content }}
+      </p>
       <ModifTask v-bind="task" />
-      <button class="btn" @click="deleteTask(task.id)" v-if="jwtStore.role=='ADMIN'">X Supprimer</button>
+      <button class="btn colorText supprStyle" @click="deleteTask(task.id)" v-if="jwtStore.role=='ADMIN'">X Supprimer</button>
     </div>
     <h2 v-if="tasks?.length === 0">No tasks</h2>
 
@@ -37,25 +40,36 @@ async function deleteTask(id) {
 
 <style>
 .body {
-
   align-items: center;
   display: flex;
   justify-content: center;
   flex-direction: column;
   align-items: center;
   margin-top: 75px;
-  padding: 10px;
+}
 
+.colorText {
+  color: black;
+  margin: 10px;
+  cursor: pointer;
+}
+
+.btn:hover{
+  color: red;
 }
 
 .btn {
   margin-left: 15px;
+  background-color: #D9D9D9;
 }
 
 .tasks {
-
   height: 25px;
   margin-top: 5px;
+}
+
+.supprStyle{
+  border-radius: 20px 20px 20px 20px;
 }
 
 #tasks {
@@ -63,5 +77,9 @@ async function deleteTask(id) {
   justify-content: space-around;
   align-items: center;
   padding: 10px;
+}
+
+.space{
+  margin-left: 15px;
 }
 </style>

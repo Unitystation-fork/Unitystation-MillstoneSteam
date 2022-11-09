@@ -1,9 +1,9 @@
 <template>
-  <form action="">
-    <input type="text" v-model="titleInput" />
-    <input type="text" v-model="contentInput" />
-    <input type="checkbox" v-model="completedInput" />
-    <input class="colorText" type="submit" value="OK" />
+  <form action="" class="space" v-if="jwtStore.role=='ADMIN'">
+    <input class="colorText inputStyle inputWrite" type="text" v-model="titleInput" />
+    <input class="colorText inputStyle inputWrite" type="text" v-model="contentInput" />
+    <input type="checkbox" v-model="completedInput" class="check"/>
+    <input class="colorText check inputStyle" type="submit" value="OK" />
   </form>
 
 </template>
@@ -18,16 +18,13 @@ const { id, title, content, completed } = defineProps({
   completed: Boolean
 })
 
-console.log(id)
-
-console.log(id, title, content, completed)
 const taskStore = useTaskStore()
-await taskStore.setTasks()
+
 const jwtStore = useJwtStore()
 
 const titleInput = ref(title)
 const contentInput = ref(content)
-const completedInput = ref(completed) //ref() variable reactif dans Vue
+const completedInput = ref(completed)
 
 async function updateTask() {
   const res = await fetch("http://localhost:3000/api/task/" + id, {
@@ -56,5 +53,27 @@ async function updateTask() {
 .colorText {
   color: black;
   margin: 10px;
+}
+
+.check{
+  cursor: pointer;
+}
+
+.space{
+  padding: 20px;
+  display: flex;
+  
+}
+
+.inputStyle{
+  border-radius:  20px 20px 20px 20px;
+  text-align: center;
+  background-color: #D9D9D9;
+}
+
+.inputWrite{
+  cursor: text !important; 
+  height: 20px;
+  background-color: #D9D9D9;
 }
 </style>
