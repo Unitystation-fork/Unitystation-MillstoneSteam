@@ -21,7 +21,7 @@ const jwtStore = useJwtStore();
 <style scoped>
 header {
   height: 64px;
-  background-color: #8c9cff;
+  background-color: #6665d2;
   display: flex;
   justify-content: space-around;
   align-items: center;

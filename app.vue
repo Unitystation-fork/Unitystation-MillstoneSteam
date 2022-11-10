@@ -10,7 +10,6 @@
 
 <script setup>
 const showForm = ref(false);
-const listKey = ref(0);
 const show = () => {
   showForm.value = true;
 };

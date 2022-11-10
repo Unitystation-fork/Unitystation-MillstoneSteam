@@ -2,24 +2,31 @@
   <h2 v-if="taskStore.tasks.value?.length === 0">Aucune tâche à afficher</h2>
   <div class="list">
     <div class="tasks" v-for="task in taskStore.tasks" :key="task.id">
-      <h2>
-        {{ task.id }}.
-        {{ task.title }}
+      <div class="task-title">
+        <h2>
+          {{ task.id }}.
+          {{ task.title }}
+        </h2>
         <span class="status undone" v-if="!task.completed"> A faire</span>
         <span class="status done" v-if="task.completed">Fait</span>
-      </h2>
-      <p class="space">
+        <span
+          class="material-symbols-outlined delete-btn"
+          @click="deleteTask(task.id)"
+          v-if="jwtStore.role == 'ADMIN'"
+          title="Supprimer la tâche"
+        >
+          delete
+        </span>
+      </div>
+      <p class="content">
         {{ task.content }}
       </p>
-      <button @click="show">Modifier</button>
-      <ModifTask v-bind="task" :show-form="showForm" @close="closeForm"/>
-      <button
-        class="btn colorText supprStyle"
-        @click="deleteTask(task.id)"
-        v-if="jwtStore.role == 'ADMIN'"
-      >
-        X Supprimer
-      </button>
+
+      <ModifTask
+        v-bind="task"
+        v-if="jwtStore.role === 'ADMIN'"
+        class="modif-form"
+      />
     </div>
   </div>
 </template>
@@ -31,8 +38,6 @@ import { useJwtStore } from "~~/stores/jwt";
 const taskStore = useTaskStore();
 await taskStore.setTasks();
 const jwtStore = useJwtStore();
-const cols = ref(2);
-const showForm = ref(false)
 
 async function deleteTask(id) {
   const res = await fetch("http://localhost:3000/api/task/" + id, {
@@ -48,37 +53,49 @@ async function deleteTask(id) {
     await taskStore.setTasks();
   }
 }
-
-const closeForm = () => {
-  showForm.value = false;
-};
-
-const show = () => {
-  showForm.value = true;
-}
 </script>
 
 <style scoped>
 .list {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  margin: 10rem;
+  flex-direction: column;
+  margin: 10rem 15rem;
+}
+
+.modif-form {
+  margin: auto;
 }
 .tasks {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  margin: 1rem;
-  padding: 1rem;
-  border: 1px solid #8c9cff;
-  border-radius: 5px;
-  min-width: 23rem;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 32px;
+  padding-bottom: 16px;
+  padding-left: 1.8rem;
+  padding-right: 1.2rem;
+  border-radius: 3px;
+  min-width: 700px;
+  max-width: 750px;
+}
+
+.tasks:nth-child(odd) {
+  background-color: #2c2c3b;
+}
+.task-title {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  padding-bottom: 0.7rem;
 }
 
 h2 {
   font-size: 1.5rem;
-  padding: 0;
+  margin: 0;
 }
 .status {
   font-size: 1rem;
@@ -91,5 +108,19 @@ h2 {
 
 .done {
   color: #41cc81;
+}
+
+.delete-btn {
+  cursor: pointer;
+  font-size: 2rem;
+  color: white;
+  margin-left: 1rem;
+  vertical-align: middle;
+  margin-left: auto;
+}
+
+.delete-btn:hover {
+  content: "Supprimer la tâche";
+  color: #ee2020;
 }
 </style>

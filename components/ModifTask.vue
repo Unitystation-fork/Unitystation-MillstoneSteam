@@ -1,44 +1,28 @@
 <template>
   <div>
-    <transition name="fade">
-        <div class="modal-mask" v-if="showForm" />
-    </transition>
-    <transition name="fade">
-      <form
-        action=""
-        class="space"
-        v-if="jwtStore.role == 'ADMIN' && showForm"
-        @submit.prevent="updateTask"
-      >
-      <button type="button" @click="$emit('close')">
-        <span class="material-symbols-outlined"> close </span>
-      </button>
+    <form action="" class="space" @submit.prevent="updateTask">
+      <div>
+        <label for="title">Titre</label>
         <input class="inputStyle" type="text" v-model="titleInput" />
-        <input class="inputStyle" type="text" v-model="contentInput" />
-        <label for="completedInput">Fait ?</label>
-        <input type="checkbox" v-model="completedInput" class="check" />
-        <input class="inputStyle inputSubmit" type="submit" value="OK" />
-        
-      </form>
-  </transition>
-</div>
+      </div>
+      <input class="inputStyle" type="text" v-model="contentInput" />
+      <label for="completedInput">Fait ?</label>
+      <input type="checkbox" v-model="completedInput" class="check" />
+      <input class="inputStyle inputSubmit" type="submit" value="OK" />
+    </form>
+  </div>
 </template>
 
 <script setup>
 import { useJwtStore } from "~~/stores/jwt";
 import { useTaskStore } from "~~/stores/task";
 
-const { id, title, content, completed, showForm } = defineProps({
+const { id, title, content, completed } = defineProps({
   id: Number,
   title: String,
   content: String,
   completed: Boolean,
-  showForm:{
-    type: Boolean,
-    default: false,
-  }
 });
-
 
 const taskStore = useTaskStore();
 
@@ -72,7 +56,16 @@ async function updateTask() {
 </script>
 
 <style>
-
+form {
+  height: fit-content;
+  width: fit-content;
+  background-color: #262636;
+  border-radius: 10px;
+}
+label {
+  display: block;
+  text-align: center;
+}
 .check {
   cursor: pointer;
 }
@@ -94,29 +87,6 @@ async function updateTask() {
   cursor: pointer;
 }
 
-.modal-mask {
-  content: "";
-  position: absolute;
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 998;
-  background: #000000;
-  opacity: 0.6;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.01s linear;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
 .bounce-enter-active {
   animation: bounce-in 0.5s;
 }
@@ -134,5 +104,4 @@ async function updateTask() {
     transform: scale(1);
   }
 }
-
 </style>
