@@ -16,7 +16,6 @@
 import { useJwtStore } from "~/stores/jwt";
 
 const jwtStore = useJwtStore();
-
 </script>
 
 <style scoped>
@@ -38,6 +37,7 @@ button {
   font-size: 1.2rem;
   font-weight: 600;
   cursor: pointer;
+  color: white;
 }
 
 button:hover {

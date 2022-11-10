@@ -3,8 +3,10 @@
   <div class="list">
     <div class="tasks" v-for="task in taskStore.tasks" :key="task.id">
       <h2>
+        {{ task.id }}.
         {{ task.title }}
-        <span class="status" v-if="!task.isCompleted"> A faire</span>
+        <span class="status undone" v-if="!task.completed"> A faire</span>
+        <span class="status done" v-if="task.completed">Fait</span>
       </h2>
       <p class="space">
         {{ task.content }}
@@ -61,17 +63,23 @@ async function deleteTask(id) {
   padding: 1rem;
   border: 1px solid #8c9cff;
   border-radius: 5px;
-  width: 22rem;
+  min-width: 23rem;
 }
 
 h2 {
   font-size: 1.5rem;
   padding: 0;
-  align-self: center;
 }
 .status {
-  color: #ee2020;
   font-size: 1rem;
   padding-left: 1em;
+}
+
+.undone {
+  color: #ee2020;
+}
+
+.done {
+  color: #41cc81;
 }
 </style>
