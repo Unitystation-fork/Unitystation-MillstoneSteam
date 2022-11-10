@@ -165,7 +165,7 @@ button {
   cursor: pointer;
 }
 
-f .fade-enter-active,
+.fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.01s linear;
 }

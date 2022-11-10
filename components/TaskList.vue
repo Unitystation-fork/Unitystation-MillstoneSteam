@@ -11,7 +11,8 @@
       <p class="space">
         {{ task.content }}
       </p>
-      <ModifTask v-bind="task" />
+      <button @click="show">Modifier</button>
+      <ModifTask v-bind="task" :show-form="showForm" @close="closeForm"/>
       <button
         class="btn colorText supprStyle"
         @click="deleteTask(task.id)"
@@ -31,6 +32,7 @@ const taskStore = useTaskStore();
 await taskStore.setTasks();
 const jwtStore = useJwtStore();
 const cols = ref(2);
+const showForm = ref(false)
 
 async function deleteTask(id) {
   const res = await fetch("http://localhost:3000/api/task/" + id, {
@@ -45,6 +47,14 @@ async function deleteTask(id) {
   if (res.statusCode === 200) {
     await taskStore.setTasks();
   }
+}
+
+const closeForm = () => {
+  showForm.value = false;
+};
+
+const show = () => {
+  showForm.value = true;
 }
 </script>
 
