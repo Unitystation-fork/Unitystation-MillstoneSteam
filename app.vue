@@ -4,6 +4,7 @@
     <LoginForm :show-form="showForm" @close="closeForm" />
     <TaskList />
     <AddTaskForm />
+    <Footer />
   </div>
 </template>
 
@@ -19,14 +20,16 @@ const closeForm = () => {
 };
 </script>
 
-<style>
+<style scoped>
 * {
   font-family: "Ubuntu", sans-serif;
   color: white;
 }
-body {
-  min-height: 100vh;
+.body {
   background-color: #171e27;
-
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
 }
 </style>
