@@ -1,29 +1,25 @@
 ## OnePage MillstoneSteam
 Objectif Stream coop
 
-[TOCM]
-
-[TOC]
-
 ```properties
 OnePage MillstoneSteam
-├── Langages utilisés
-├── Description du projet
-├── Credit , participant, organisation
-├── But du projet / public cible
-│	 ├── Mode Viewer
-│	 └── Mode Admin
-├── Installation
-│	 ├── Dépendances
-│	 ├── Démarrez ensuite le serveur de développement :
-│	 └── PROD
-├── Mise à jour
-├── Usage
-│	 ├── Options pour le ou les admins :
-│	 └── Options pour les autres utilisateurs :
-└── ToDo
-	 ├── Prototype visuel
-	 └── Liste des taches
+├── [Langages utilisés](#langages-utilisés)
+├── [Description du projet](#description-du-projet)
+├── [Credit , participant, organisation](#credit--participant-organisation)
+├── [But du projet / public cible](#but-du-projet--public-cible)
+│	 ├── [Mode Viewer](#mode-viewer)
+│	 └── [Mode Admin](#mode-admin)
+├── [Installation](#installation)
+│	 ├── [Dépendances](#dépendances)
+│	 ├── [Démarrez ensuite le serveur de développement :](#démarrez-ensuite-le-serveur-de-développement)
+│	 └── [PROD](#prod)
+├── [Mise à jour](#mise-à-jour)
+├── [Usage](#usage)
+│	 ├── [Options pour le ou les admins :](#options-pour-le-ou-les-admins)
+│	 └── [Options pour les autres utilisateurs :](#options-pour-les-autres-utilisateurs)
+└── [ToDo](#todo)
+	 ├── [Prototype visuel](#prototype-visuel)
+	 └── [Liste des taches](#liste-des-taches)
 ```
 
 ### Langages utilisés
