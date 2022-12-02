@@ -5,9 +5,12 @@
     </transition>
     <transition name="pop">
       <form v-if="showForm" @submit.prevent="login">
-        <button type="button" @click="$emit('close')">
-          <span class="material-symbols-outlined"> close </span>
+        <button type="button">
+          <span class="material-symbols-outlined" @click="$emit('close')">
+            close
+          </span>
         </button>
+        <h2>Connexion</h2>
         <div class="form-group">
           <label for="password">Nom d'utilisateur</label>
           <input
@@ -101,9 +104,6 @@ const handleChange = () => {
   background: #000000;
   opacity: 0.6;
 }
-i {
-  height: 80px;
-}
 
 .error {
   color: #eb353a;
@@ -129,7 +129,6 @@ form {
   transform: none;
   display: flex;
   flex-direction: column;
-  gap: 1em;
   align-items: center;
   justify-content: center;
 }
@@ -145,6 +144,7 @@ input {
   padding: 0.5em 1em;
   border: none;
   border-radius: 8px;
+  color: white;
 }
 
 input[type="submit"] {
@@ -163,6 +163,7 @@ button {
   background-color: transparent;
   align-self: flex-end;
   cursor: pointer;
+  color: white;
 }
 
 .fade-enter-active,

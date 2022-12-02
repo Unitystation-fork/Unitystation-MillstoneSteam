@@ -25,9 +25,6 @@ header {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
 }
 
@@ -44,11 +41,19 @@ button:hover {
   text-decoration: underline;
 }
 
+.material-symbols-outlined {
+  vertical-align: middle;
+}
+
 img {
   height: 44px;
   width: 44px;
   clip-path: circle(50%);
   vertical-align: middle;
   margin-right: 10px;
+}
+
+.add-btn {
+  font-size: 1em;
 }
 </style>
