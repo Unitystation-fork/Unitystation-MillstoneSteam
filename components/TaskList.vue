@@ -1,41 +1,196 @@
 <template>
-  <div class="body">
-    <h2 class="tasks" v-for="task in taskStore.tasks" id="tasks" :key="task.id">
-      {{ task.title }}
-    </h2>
-    <h2 v-if="tasks?.length === 0">No tasks</h2>
+  <div>
+    <h2 v-if="taskStore.tasks.value?.length === 0">Aucune tâche à afficher</h2>
+    <div class="list">
+      <button v-if="isModifShown" @click="isModifShown = false">
+        Terminer les modifications
+      </button>
+      <div class="tasks" v-for="task in taskStore.tasks" :key="task.id">
+        <div class="task-title">
+          <h2>
+            {{ task.id }}.
+            {{ task.title }}
+          </h2>
+          <span class="status undone" v-if="!task.completed"> A faire</span>
+          <span class="status done" v-if="task.completed">Fait</span>
+
+          <span
+            class="material-symbols-outlined delete-btn"
+            @click="deleteTask(task.id)"
+            v-if="jwtStore.role == 'ADMIN'"
+            title="Supprimer la tâche"
+          >
+            delete
+          </span>
+          <span
+            class="material-symbols-outlined edit-btn"
+            :class="task.id"
+            v-if="jwtStore.role == 'ADMIN'"
+            @click="isModifShown = true"
+          >
+            edit
+          </span>
+        </div>
+        <p class="content">
+          {{ task.content }}
+        </p>
+
+        <ModifTask
+          v-bind="task"
+          v-if="jwtStore.role === 'ADMIN' && isModifShown"
+          class="modif-form"
+        />
+      </div>
+      <button v-if="isModifShown" @click="isModifShown = false">
+        Terminer les modifications
+      </button>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { useTaskStore } from "~/stores/task"
-const taskStore = useTaskStore()
-await taskStore.setTasks()
+import { useTaskStore } from "~/stores/task";
+import { useJwtStore } from "~~/stores/jwt";
+
+const taskStore = useTaskStore();
+await taskStore.setTasks();
+const jwtStore = useJwtStore();
+const isModifShown = ref(false);
+
+async function deleteTask(id) {
+  const res = await fetch("http://localhost:3000/api/task/" + id, {
+    //await fait attendre que toute la fonction soit déroulée
+    headers: {
+      Authorization: "Bearer " + jwtStore.jwt,
+    },
+    method: "DELETE",
+  })
+    .then((r) => r.json())
+    .catch((e) => console.log("error", e));
+  if (res.statusCode === 200) {
+    await taskStore.setTasks();
+  }
+}
 </script>
 
-<style>
-.body {
+<style scoped>
+button {
+  display: block;
+  background-color: #8c9cff;
+  color: white;
+  font-weight: 600;
+  border: 1px solid #8c9cff;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 2em auto;
+  cursor: pointer;
+  padding: 0.4em;
+  width: fit-content;
+}
 
-  align-items: center;
+.btns {
   display: flex;
   justify-content: center;
-  flex-direction: column;
   align-items: center;
-  margin-top: 75px;
-  padding: 10px;
-
 }
 
-.tasks {
-
-  height: 25px;
-  margin-top: 5px;
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 1.5em;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  vertical-align: middle;
 }
 
-#tasks {
+button:hover {
+  background-color: #6c7cff;
+  border: 1px solid #6c7cff;
+}
+.list {
   display: flex;
-  justify-content: space-around;
+  flex-direction: column;
+  margin: 6rem auto;
+}
+
+.modif-form {
+  margin: auto;
+}
+.tasks {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 32px;
+  padding-bottom: 16px;
+  padding-left: 1.8rem;
+  padding-right: 1.2rem;
+  border-radius: 3px;
+  min-width: 700px;
+  max-width: 750px;
+}
+
+.tasks:nth-child(odd) {
+  background-color: #2c2c3b;
+}
+.task-title {
+  display: flex;
+  justify-content: flex-start;
   align-items: center;
-  padding: 10px;
+  width: 100%;
+  padding-bottom: 0.7rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+.status {
+  font-size: 1rem;
+  padding-left: 1em;
+}
+
+.undone {
+  color: #ee2020;
+}
+
+.done {
+  color: #41cc81;
+}
+
+.delete-btn {
+  cursor: pointer;
+  font-size: 2rem;
+  color: white;
+  margin-left: 1rem;
+  vertical-align: middle;
+  margin-left: auto;
+}
+
+.edit-btn {
+  cursor: pointer;
+  font-size: 2rem;
+  color: white;
+  margin-left: 1rem;
+  vertical-align: middle;
+}
+
+.edit-btn:hover {
+  color: #8c9cff;
+}
+
+.delete-btn:hover {
+  content: "Supprimer la tâche";
+  color: #ee2020;
 }
 </style>

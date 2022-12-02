@@ -7,7 +7,7 @@
     <h1>Bienvenue sur le projet milestone !</h1>
     <div class="btns">
       <button v-if="!jwtStore.jwt" @click="$emit('login')">Login</button>
-      <button v-if="jwtStore.jwt" @click="logout">Logout</button>
+      <button v-if="jwtStore.jwt" @click="jwtStore.logout()">Logout</button>
     </div>
   </header>
 </template>
@@ -16,23 +16,15 @@
 import { useJwtStore } from "~/stores/jwt";
 
 const jwtStore = useJwtStore();
-
-function logout() {
-  jwtStore.setJwt(null);
-  console.log(jwtStore.jwt);
-}
 </script>
 
 <style scoped>
 header {
   height: 64px;
-  background-color: #8c9cff;
+  background-color: #6665d2;
   display: flex;
   justify-content: space-around;
   align-items: center;
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
 }
 
@@ -42,10 +34,15 @@ button {
   font-size: 1.2rem;
   font-weight: 600;
   cursor: pointer;
+  color: white;
 }
 
 button:hover {
   text-decoration: underline;
+}
+
+.material-symbols-outlined {
+  vertical-align: middle;
 }
 
 img {
@@ -54,5 +51,9 @@ img {
   clip-path: circle(50%);
   vertical-align: middle;
   margin-right: 10px;
+}
+
+.add-btn {
+  font-size: 1em;
 }
 </style>
