@@ -49,20 +49,14 @@ const taskStore = useTaskStore();
 const emit = defineEmits(["close"]);
 
 async function addTask() {
-  console.log(title.value, content.value);
-
   if (title.value.length === 0 || content.value.length === 0) {
     error.value = "Veuillez remplir tous les champs";
-    console.log("1");
     return;
   }
-  console.log("2");
   if (jwtStore.jwt === null) {
     error.value = "Veuillez vous connecter";
-    console.log("3");
     return;
   }
-  console.log("4");
 
   const res = await fetch("http://localhost:3000/api/task", {
     method: "POST",
@@ -79,7 +73,6 @@ async function addTask() {
     .then((r) => r.json())
     .catch((e) => {
       error.value = e.body.message;
-      console.log(e);
     });
   if (res.statusCode === 200) {
     await taskStore.setTasks();
