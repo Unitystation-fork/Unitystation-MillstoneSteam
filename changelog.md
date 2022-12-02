@@ -10,3 +10,10 @@ Dae
       - ajout manuel de la table des matiere.
        
 ------------------------------------------------------
+Warwi
+
+  - Modification du readme.md
+    - ajout interface admin :
+      - modif/créa/voir/suppr/ajout utilisateurs
+      - modif/créa/voir/suppr/ajout tâches
+
