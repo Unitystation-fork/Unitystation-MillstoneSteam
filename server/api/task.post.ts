@@ -39,16 +39,21 @@ const createTask = defineEventHandler(async (event) => {
         content,
       },
     });
-    console.log
     return {
       statusCode: 200,
       body: {message: "Task created", task: task},
     };
-  } catch (error) {
-    console.log(error);
+  } catch (e) {
+    console.log(e);
+    if(e.name ==="JsonWebTokenError"){
+      return { statusCode: 401, body: { error: "Invalid token" } };
+    }
+    if(e.name==="TokenExpiredError"){
+      return { statusCode: 401, body: { error: "Expired token" } };
+     }
     return {
       statusCode: 500,
-      body: { message: "Task could not be created", error: error },
+      body: { error: "Task could not be edited", details: e },
     };
   }
 });

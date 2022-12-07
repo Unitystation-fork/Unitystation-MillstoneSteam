@@ -1,7 +1,10 @@
 <template>
   <div>
-    <h2 v-if="taskStore.tasks.value?.length === 0">Aucune tâche à afficher</h2>
-    <div class="list">
+    <h2 v-if="taskStore.tasks.value?.length === 0 || !taskStore.tasks">
+      Aucune tâche à afficher
+    </h2>
+    <div class="error" v-if="error !== ''">{{ error }}</div>
+    <div class="list" v-if="error === ''">
       <button v-if="isModifShown" @click="isModifShown = false">
         Terminer les modifications
       </button>
@@ -51,11 +54,17 @@
 <script setup>
 import { useTaskStore } from "~/stores/task";
 import { useJwtStore } from "~~/stores/jwt";
-
 const taskStore = useTaskStore();
-await taskStore.setTasks();
+const tasks = await taskStore.setTasks();
 const jwtStore = useJwtStore();
 const isModifShown = ref(false);
+const error = ref("");
+const deleteError = ref("");
+
+if (!tasks) {
+  error.value =
+    "Une erreur est survenue durant l'affichage des tâches. Veuillez réessayer ultérieurement.";
+}
 
 async function deleteTask(id) {
   const res = await fetch("http://localhost:3000/api/task/" + id, {
@@ -66,10 +75,26 @@ async function deleteTask(id) {
     method: "DELETE",
   })
     .then((r) => r.json())
-    .catch((e) => console.log("error", e));
-  if (res.statusCode === 200) {
-    await taskStore.setTasks();
+    .catch((e) => {
+      deleteError.value = e.message;
+      console.log(e);
+    });
+
+  if (res.statusCode !== 200) {
+    console.log(res.body);
+    if (res.body.error === "Invalid token") {
+      deleteError.value = "Vous n'êtes pas autorisé à modifier cette tâche.";
+    }
+    if (res.body.error === "Expired token") {
+      deleteError.value = "Votre session a expiré, veuillez vous reconnecter.";
+    } else {
+      deleteError.value =
+        "Une erreur est survenue lors de la suppression de la tâche.";
+    }
+    alert(deleteError.value);
+    return;
   }
+  await taskStore.setTasks();
 }
 </script>
 
