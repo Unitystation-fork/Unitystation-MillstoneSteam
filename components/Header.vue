@@ -1,5 +1,6 @@
 <template>
   <header>
+    <p>{{date}}🇫🇷  {{date6}}🇨🇦</p>
     <img
       src="@/assets/img/305474881_500277108772915_4425958856109240367_n.jpg"
       alt="twitch"
@@ -14,6 +15,11 @@
 
 <script setup lang="ts">
 import { useJwtStore } from "~/stores/jwt";
+
+let now = new Date();
+
+let date = now.toLocaleString('fr-FR',{hour:'2-digit', minute:'2-digit', hour12:false, timeZone:'Europe/Paris'});
+let date6 = now.toLocaleString('fr-FR',{hour:'2-digit', minute:'2-digit', hour12:false, timeZone:'America/Toronto'});
 
 const jwtStore = useJwtStore();
 </script>
