@@ -72,13 +72,24 @@ async function addTask() {
   })
     .then((r) => r.json())
     .catch((e) => {
-      error.value = e.body.message;
+      error.value = e;
     });
-  if (res.statusCode === 200) {
-    await taskStore.setTasks();
-    emit("close");
+  if (res.statusCode !== 200) {
+    console.log(res.body.error);
+    if (res.body.error === "Invalid token") {
+      error.value = "Vous n'êtes pas autorisé à modifier cette tâche.";
+      return;
+    }
+    if (res.body.error === "Expired token") {
+      error.value = "Votre session a expiré, veuillez vous reconnecter.";
+      return;
+    }
+    error.value =
+      "Une erreur est survenue lors de la modification de la tâche.";
+    return;
   }
-  error.value = res.body.message;
+  await taskStore.setTasks();
+  emit("close");
 }
 </script>
 

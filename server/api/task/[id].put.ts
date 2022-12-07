@@ -67,6 +67,12 @@ const editTask = defineEventHandler(async (event) => {
     };
   } catch (e) {
     console.log(e);
+    if(e.name ==="JsonWebTokenError"){
+      return { statusCode: 401, body: { error: "Invalid token" } };
+    }
+    if(e.name==="TokenExpiredError"){
+      return { statusCode: 401, body: { error: "Expired token" } };
+     }
     return {
       statusCode: 500,
       body: { message: "Task could not be edited", error: e },

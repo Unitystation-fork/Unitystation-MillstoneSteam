@@ -25,6 +25,7 @@
         value="Modifier la tâche"
       />
     </form>
+    <span class="error" v-if="error !== ''">{{ error }}</span>
   </div>
 </template>
 
@@ -46,6 +47,7 @@ const jwtStore = useJwtStore();
 const titleInput = ref(title);
 const contentInput = ref(content);
 const completedInput = ref(completed);
+const error = ref("");
 
 const emit = defineEmits(["close"]);
 
@@ -63,13 +65,27 @@ async function updateTask() {
     }),
   })
     .then((r) => r.json())
-    .catch((e) => console.log("error", e));
+    .catch((e) => {
+      error.value = e.message;
+      console.log(e);
+    });
 
-  if (res.statusCode === 200) {
-    console.log("res", res);
-    await taskStore.setTasks();
-    emit("close");
+  if (res.statusCode !== 200) {
+    console.log(res.body);
+    if (res.body.error === "Invalid token") {
+      error.value = "Vous n'êtes pas autorisé à modifier cette tâche.";
+      return;
+    }
+    if (res.body.error === "Expired token") {
+      error.value = "Votre session a expiré, veuillez vous reconnecter.";
+      return;
+    }
+    error.value =
+      "Une erreur est survenue lors de la modification de la tâche.";
+    return;
   }
+  await taskStore.setTasks();
+  emit("close");
 }
 </script>
 
@@ -81,6 +97,10 @@ form {
   border-radius: 10px;
   display: flex;
   flex-direction: column;
+}
+.error {
+  text-align: center;
+  color: #ee2020;
 }
 label {
   display: block;
