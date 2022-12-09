@@ -10,10 +10,14 @@
       <button v-if="jwtStore.jwt" @click="logout">Logout</button>
     </div>
   </header>
+  <!-- <div class="warning" v-if="jwtStore.role !==''"> -->
+    <h3 class="textWarning"><b class="textWarning">POUR VOS YEUX UNIQUEMENT</b>, ne partager pas cette page elle contient des liens</h3>
+  <!-- </div> -->
+
 </template>
 
 <script setup lang="ts">
-import { useJwtStore } from "~/stores/jwt";
+import { useJwtStore } from "~~/stores/jwt"
 
 const jwtStore = useJwtStore();
 
@@ -34,6 +38,16 @@ header {
   top: 0;
   left: 0;
   width: 100%;
+}
+
+.warning {
+  /* background-color: orangered; */
+  text-align: center;
+  top: 0;
+}
+
+.textWarning{
+  color: red;
 }
 
 button {
