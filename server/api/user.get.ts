@@ -26,7 +26,7 @@ const users = defineEventHandler(async (event) => {
     }
     //check if user is admin
     if (user.role !== "ADMIN") {
-      throw "You do not have the permission to create tasks";
+      throw "You do not have the permission to get all users";
     }
     // get all users from the database and return them
     const users = await prisma.user.findMany({});
