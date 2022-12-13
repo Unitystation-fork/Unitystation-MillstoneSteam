@@ -18,7 +18,7 @@
     "@prisma/client": "^4.5.0",
     "bcrypt": "^5.1.0",
     "jsonwebtoken": "^8.5.1",
-    "pinia": "^2.0.23",
+    "pinia": "^2.0.28",
     "pinia-plugin-persistedstate": "^2.3.0"
   }
 }
