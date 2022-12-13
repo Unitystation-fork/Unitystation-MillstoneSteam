@@ -10,9 +10,18 @@
         <span class="material-symbols-outlined"> note_add </span> Ajouter une
         tâche
       </button>
+      <button
+        v-if="jwtStore.role === 'ADMIN' && jwtStore.jwt"
+        class="add-person-btn"
+        @click="showAddUser = true"
+      >
+        <span class="material-symbols-outlined"> person_add</span> Ajouter un
+        utilisateur
+      </button>
     </div>
     <LoginForm :show-form="showForm" @close="closeForm" />
     <TaskList />
+    <UserList />
     <AddTaskForm
       v-if="showAddTask && jwtStore.role === 'ADMIN'"
       @close="showAddTask = false"
@@ -26,6 +35,7 @@ import { useJwtStore } from "./stores/jwt";
 
 const showForm = ref(false);
 const showAddTask = ref(false);
+const showwAddUser = ref(false);
 const show = () => {
   showForm.value = true;
 };
@@ -66,6 +76,11 @@ button {
   margin: 10px;
   cursor: pointer;
   padding: 0.4em;
+}
+
+button:hover {
+  background-color: #6c7cff;
+  border: 1px solid #6c7cff;
 }
 
 .material-symbols-outlined {
