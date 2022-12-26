@@ -10,9 +10,9 @@
       <button v-if="jwtStore.jwt" @click="logout">Logout</button>
     </div>
   </header>
-  <!-- <div class="warning" v-if="jwtStore.role !==''"> -->
+  <div class="warning" v-if="jwtStore.role !==''">
     <h3 class="textWarning"><b class="textWarning">POUR VOS YEUX UNIQUEMENT</b>, ne partager pas cette page elle contient des liens</h3>
-  <!-- </div> -->
+  </div>
 
 </template>
 

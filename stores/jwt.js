@@ -12,6 +12,7 @@ export const useJwtStore = defineStore("jwt", {
   actions: {
     setJwt(jwt) {
       this.jwt = jwt;
+      // this.role = role;
     },
     setRole(role) {
       this.role = role;
