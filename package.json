@@ -18,6 +18,9 @@
     "@prisma/client": "^4.5.0",
     "bcrypt": "^5.1.0",
     "jsonwebtoken": "^8.5.1",
+    "oauth2-server": "^3.1.1",
+    "passport": "^0.6.0",
+    "passport-discord": "^0.1.4",
     "pinia": "^2.0.23",
     "pinia-plugin-persistedstate": "^2.3.0"
   }
