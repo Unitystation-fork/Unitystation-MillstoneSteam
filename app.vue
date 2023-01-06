@@ -21,9 +21,9 @@
     </div>
     <LoginForm :show-form="showForm" @close="closeForm" />
     <TaskList />
-    <UserList />
+    <UserList v-if="jwtStore.jwt && jwtStore.role === 'ADMIN'" />
     <AddTaskForm
-      v-if="showAddTask && jwtStore.role === 'ADMIN'"
+      v-if="showAddTask && jwtStore.role === 'ADMIN' && jwtStore.jwt"
       @close="showAddTask = false"
     />
     <Footer />

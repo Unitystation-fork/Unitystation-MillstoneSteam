@@ -1,10 +1,10 @@
 <template>
   <div>
     <h2>Liste des utilisateurs</h2>
-    <span class="error" v-if="error === ''"
+    <span class="error" v-if="!users && error !== ''"
       >Une erreur est survenue. Utilisateurs impossible à afficher.</span
     >
-    <table v-if="error !== ''">
+    <table v-if="users">
       <thead>
         <tr>
           <th>ID</th>
@@ -19,14 +19,23 @@
           <td>{{ user.id }}</td>
           <td>{{ user.name }}</td>
           <td>{{ user.role }}</td>
-          <td class="action edit">
+          <td class="action">
             <span
-              class="material-symbols-outlined edit-btn"
+              class="material-symbols-outlined edit-btn edit"
               :class="user.id"
-              @click="isModifShown = true"
+              v-if="!showModifUserForm"
+              @click="showModifUserForm = true"
             >
               edit
             </span>
+            <ModifUser
+              v-bind="user"
+              v-if="showModifUserForm"
+              @close="showModifUserForm = false"
+              @errorOnUpdateUser="
+                error = `La modification de l'utilisateur ${user.name} a échoué.`
+              "
+            />
           </td>
           <td class="action delete">
             <span
@@ -43,24 +52,22 @@
 </template>
 
 <script setup>
-import { useUserStore } from "~/stores/user";
 import { useJwtStore } from "~~/stores/jwt";
-const userStore = useUserStore();
-const users = await userStore.setUsers();
+import { useUserStore } from "~/stores/user";
 const jwtStore = useJwtStore();
-const isModifShown = ref(false);
+const userStore = useUserStore();
+const jwt = jwtStore.jwt;
+const users = await userStore.setUsers(jwt);
+const showModifUserForm = ref(false);
 const error = ref("");
-const deleteError = ref("");
 
-console.log(users);
-
-if (!users) {
+if (users === false) {
   error.value =
     "Une erreur est survenue durant l'affichage des utilisateurs. Veuillez réessayer ultérieurement.";
 }
 
 const deleteUser = async (id) => {
-  await userStore.deleteUser(id);
+  await userStore.deleteUser(jwt, id);
 };
 </script>
 
