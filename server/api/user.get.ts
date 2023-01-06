@@ -7,7 +7,7 @@ const users = defineEventHandler(async (event) => {
   const token = auth !== undefined ? auth.split(" ")[1] : null;
   try {
     // verify the token and extract the user id from it
-    if (!token) {
+    if (!token || token === null) {
       throw "No token provided";
     }
     const decoded: string | JwtPayload = jwt.verify(token, "shhhhhhh");
@@ -34,10 +34,17 @@ const users = defineEventHandler(async (event) => {
       statusCode: 200,
       body: { users },
     };
-  } catch (error) {
+  } catch (e) {
+    console.log(e);
+    if(e.name ==="JsonWebTokenError"){
+      return { statusCode: 401, body: { error: "Invalid token" } };
+    }
+    if(e.name==="TokenExpiredError"){
+      return { statusCode: 401, body: { error: "Expired token" } };
+     }
     return {
       statusCode: 500,
-      body: { message: "User could not be found", error: error },
+      body: { message: "User could not be found", error: e },
     };
   }
 });
