@@ -32,7 +32,7 @@ export const useUserStore = defineStore("users", {
             return true;
         },
 
-        async createUser(jwt, name, role, password) {
+        async addUser(jwt, name, role, password) {
             const res = await fetch("http://localhost:3000/api/user", {
                     method: "POST",
                     headers: {
@@ -66,7 +66,9 @@ export const useUserStore = defineStore("users", {
         },
 
         async deleteUser(jwt, id) {
-            const conf = confirm("Are you sure you want to delete this user?");
+            const conf = confirm(
+                "Êtes vous sûr de vouloir supprimer cet utilisateur ?"
+            );
             if (!conf) {
                 return;
             }

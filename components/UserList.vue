@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="user-list">
     <h2>Liste des utilisateurs</h2>
     <span class="error" v-if="!users && error !== ''"
       >Une erreur est survenue. Utilisateurs impossible à afficher.</span
@@ -15,7 +15,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="user in userStore.users" :key="user.id">
+        <tr v-for="user in userStore.users" :key="user.id" :id="user.id">
           <td>{{ user.id }}</td>
           <td>{{ user.name }}</td>
           <td>{{ user.role }}</td>
@@ -24,14 +24,18 @@
               class="material-symbols-outlined edit-btn edit"
               :class="user.id"
               v-if="!showModifUserForm"
-              @click="showModifUserForm = true"
+              @click="
+                (showModifUserForm = true) && (location.hash = '#' + user.id)
+              "
             >
               edit
             </span>
             <ModifUser
               v-bind="user"
               v-if="showModifUserForm"
-              @close="showModifUserForm = false"
+              @close="
+                showModifUserForm = false && (location.hash = '#' + user.id)
+              "
               @errorOnUpdateUser="
                 error = `La modification de l'utilisateur ${user.name} a échoué.`
               "
@@ -60,6 +64,7 @@ const jwt = jwtStore.jwt;
 const users = await userStore.setUsers(jwt);
 const showModifUserForm = ref(false);
 const error = ref("");
+const location = Location;
 
 if (users === false) {
   error.value =
