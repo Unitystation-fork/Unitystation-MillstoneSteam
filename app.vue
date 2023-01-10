@@ -1,6 +1,6 @@
 <template>
   <div class="body">
-    <Header @login="show" />
+    <Header @login="show" id="top" />
     <div class="btns">
       <button
         v-if="jwtStore.role === 'ADMIN' && jwtStore.jwt"
@@ -17,6 +17,12 @@
       v-if="showAddTask && jwtStore.role === 'ADMIN'"
       @close="showAddTask = false"
     />
+    <a href="#top" v-if="showScrollToTop"
+      ><img
+        class="scroll-to-top"
+        src="./assets/img/arrow_up.png"
+        alt="scroll-to-top"
+    /></a>
     <Footer />
   </div>
 </template>
@@ -26,14 +32,25 @@ import { useJwtStore } from "./stores/jwt";
 
 const showForm = ref(false);
 const showAddTask = ref(false);
+const showScrollToTop = ref(false);
 const show = () => {
   showForm.value = true;
 };
+
 const jwtStore = useJwtStore();
 
 const closeForm = () => {
   showForm.value = false;
 };
+
+if (typeof window !== "undefined")
+  window.onscroll = () => {
+    if (window.pageYOffset > 100) {
+      showScrollToTop.value = true;
+    } else {
+      showScrollToTop.value = false;
+    }
+  };
 </script>
 
 <style scoped>
@@ -82,5 +99,13 @@ button {
   direction: ltr;
   -webkit-font-smoothing: antialiased;
   vertical-align: middle;
+}
+
+.scroll-to-top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
 }
 </style>
