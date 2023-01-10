@@ -67,11 +67,17 @@ const editUser = defineEventHandler(async (event) => {
       statusCode: 200,
       body: { message: "User updated", user : updatedUser },
     };
-  } catch (error) {
-    console.log(error);
+  } catch (e) {
+    console.log(e);
+    if(e.name ==="JsonWebTokenError"){
+      return { statusCode: 401, body: { error: "Invalid token" } };
+    }
+    if(e.name==="TokenExpiredError"){
+      return { statusCode: 401, body: { error: "Expired token" } };
+     }
     return {
       statusCode: 500,
-      body: { message: "User could not be updated", error: error },
+      body: { message: "User could not be updated", error: e },
     };
   }
 });
