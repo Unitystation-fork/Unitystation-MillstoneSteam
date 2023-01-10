@@ -5,8 +5,9 @@ const prisma = new PrismaClient();
 const createTask = defineEventHandler(async (event) => {
     // get the body of the request and asign its parameters to variables
   const body = await readBody(event);
-  const title = body.title;
-  const content = body.content;
+  const title : string = body.title;
+  const content : string = body.content;
+  const isContentPrivate : boolean = body.isContentPrivate;
   // get the token from the request headers
   const auth = event.req.headers.authorization;
   const token = (auth !== undefined) ?  auth.split(" ")[1] : null;
@@ -15,8 +16,8 @@ const createTask = defineEventHandler(async (event) => {
     if(!token) {
         throw "No token provided";
     }
-    const decoded :string | JwtPayload= jwt.verify(token, "shhhhhhh");
-    if(!decoded) {
+    const decoded :string | JwtPayload = jwt.verify(token, "shhhhhhh");
+    if(!decoded || typeof decoded === "string") {
         throw "Invalid token";
     }
     // check if the user exists and throw an error if it doesn't
@@ -37,6 +38,7 @@ const createTask = defineEventHandler(async (event) => {
       data: {
         title,
         content,
+        isContentPrivate
       },
     });
     return {
