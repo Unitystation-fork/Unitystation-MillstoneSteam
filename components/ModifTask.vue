@@ -19,6 +19,10 @@
         <input type="checkbox" v-model="completedInput" class="check" />
         <label for="completedInput">Fait ?</label>
       </div>
+      <div class="isContentPrivateInput">
+        <input type="checkbox" v-model="isContentPrivateInput" class="check" />
+        <label for="isContentPrivateInput">Le contenu est-il privé ?</label>
+      </div>
       <input
         class="inputStyle inputSubmit"
         type="submit"
@@ -33,11 +37,12 @@
 import { useJwtStore } from "~~/stores/jwt";
 import { useTaskStore } from "~~/stores/task";
 
-const { id, title, content, completed } = defineProps({
+const { id, title, content, completed, isContentPrivate } = defineProps({
   id: Number,
   title: String,
   content: String,
   completed: Boolean,
+  isContentPrivate: Boolean,
 });
 
 const taskStore = useTaskStore();
@@ -47,6 +52,7 @@ const jwtStore = useJwtStore();
 const titleInput = ref(title);
 const contentInput = ref(content);
 const completedInput = ref(completed);
+const isContentPrivateInput = ref(isContentPrivate);
 const error = ref("");
 
 const emit = defineEmits(["close"]);
@@ -62,6 +68,7 @@ async function updateTask() {
       title: titleInput.value,
       content: contentInput.value,
       completed: completedInput.value,
+      isContentPrivate: isContentPrivateInput.value,
     }),
   })
     .then((r) => r.json())

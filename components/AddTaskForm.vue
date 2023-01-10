@@ -30,6 +30,14 @@
             v-model="content"
           />
         </div>
+        <div class="content-private">
+          <input
+            type="checkbox"
+            name="isContentPrivate"
+            v-model="isContentPrivate"
+          />
+          <label for="isContentPrivate"> Le contenu est-il privé ?</label>
+        </div>
         <input class="btnSubmitStyle" type="submit" value="Ajouter" />
         <p v-if="error !== ''">{{ error }}</p>
       </form>
@@ -43,6 +51,7 @@ import { useTaskStore } from "~~/stores/task";
 
 const title = ref("");
 const content = ref("");
+const isContentPrivate = ref(false);
 const jwtStore = useJwtStore();
 const error = ref("");
 const taskStore = useTaskStore();
@@ -68,6 +77,7 @@ async function addTask() {
     body: JSON.stringify({
       title: title.value,
       content: content.value,
+      isContentPrivate: isContentPrivate.value,
     }),
   })
     .then((r) => r.json())
@@ -111,6 +121,17 @@ async function addTask() {
   cursor: pointer;
   align-self: flex-end;
 }
+
+.content-private {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.content-private label {
+  margin-left: 8px !important;
+}
+
 label {
   color: white;
   padding-bottom: 0;
