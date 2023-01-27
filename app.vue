@@ -1,6 +1,10 @@
 <template>
   <div class="body">
     <Header @login="show" id="top" />
+    <Warning
+      v-if="jwtStore.jwt && showWarning"
+      @closeWarning="showWarning = false"
+    />
     <div class="btns">
       <button
         v-if="jwtStore.role === 'ADMIN' && jwtStore.jwt"
@@ -33,6 +37,7 @@ import { useJwtStore } from "./stores/jwt";
 const showForm = ref(false);
 const showAddTask = ref(false);
 const showScrollToTop = ref(false);
+const showWarning = ref(true);
 const show = () => {
   showForm.value = true;
 };
