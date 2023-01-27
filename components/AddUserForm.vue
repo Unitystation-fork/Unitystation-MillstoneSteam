@@ -4,42 +4,46 @@
       <div class="modal-mask" />
     </transition>
     <transition name="pop">
-      <form method="POST" @submit.prevent="addTask">
+      <form method="post" @submit.prevent="addUser">
         <span
           class="material-symbols-outlined close-btn"
           @click="$emit('close')"
+          >close</span
         >
-          close
-        </span>
-        <h2>Ajouter une tâche</h2>
+        <h2>Ajouter un utilisateur</h2>
         <div>
-          <label for="title">Titre</label>
+          <label for="username">Nom d'utilisateur</label>
           <input
-            name="title"
+            name="name"
             class="colorText inputStyleAdd"
             type="text"
-            v-model="title"
+            v-model="name"
           />
         </div>
         <div>
-          <label for="content">Description</label>
+          <label for="password">Mot de passe</label>
           <input
-            name="content"
+            name="password"
             class="colorText inputStyleAdd"
-            type="text"
-            v-model="content"
+            type="password"
+            v-model="password"
           />
         </div>
-        <div class="content-private">
-          <input
-            type="checkbox"
-            name="isContentPrivate"
-            v-model="isContentPrivate"
-          />
-          <label for="isContentPrivate"> Le contenu est-il privé ?</label>
+        <div>
+          <label for="role">Rôle</label>
+          <select
+            name="role"
+            class="colorText inputStyleAdd"
+            v-model="role"
+            id="role"
+          >
+            <option value="ADMIN">Administrateur</option>
+            <option value="USER">Utilisateur</option>
+            <option value="STREAMER">Streamer</option>
+          </select>
         </div>
         <input class="btnSubmitStyle" type="submit" value="Ajouter" />
-        <p v-if="error !== ''">{{ error }}</p>
+        <p class="error" v-if="error !== ''">{{ error }}</p>
       </form>
     </transition>
   </div>
@@ -47,18 +51,18 @@
 
 <script setup>
 import { useJwtStore } from "~~/stores/jwt";
-import { useTaskStore } from "~~/stores/task";
+import { useUserStore } from "~~/stores/user";
 
-const title = ref("");
-const content = ref("");
-const isContentPrivate = ref(false);
 const jwtStore = useJwtStore();
+const userStore = useUserStore();
+const name = ref("");
+const password = ref("");
+const role = ref("USER");
 const error = ref("");
-const taskStore = useTaskStore();
 const emit = defineEmits(["close"]);
 
-async function addTask() {
-  if (title.value.length === 0 || content.value.length === 0) {
+const addUser = async () => {
+  if (name.value.length === 0 || password.value.length === 0) {
     error.value = "Veuillez remplir tous les champs";
     return;
   }
@@ -66,43 +70,32 @@ async function addTask() {
     error.value = "Veuillez vous connecter";
     return;
   }
-
-  const res = await fetch("http://localhost:3000/api/task", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + jwtStore.jwt,
-    },
-
-    body: JSON.stringify({
-      title: title.value,
-      content: content.value,
-      isContentPrivate: isContentPrivate.value,
-    }),
-  })
-    .then((r) => r.json())
-    .catch((e) => {
-      error.value = e;
-    });
-  if (res.statusCode !== 200) {
-    console.log(res.body.error);
-    if (res.body.error === "Invalid token") {
-      error.value = "Vous n'êtes pas autorisé à modifier cette tâche.";
-      return;
-    }
-    if (res.body.error === "Expired token") {
-      error.value = "Votre session a expiré, veuillez vous reconnecter.";
-      return;
-    }
-    error.value =
-      "Une erreur est survenue lors de la modification de la tâche.";
+  if (jwtStore.role !== "ADMIN") {
+    error.value = "Vous n'avez pas les droits pour ajouter un utilisateur";
     return;
   }
-  await taskStore.setTasks();
-  emit("close");
-}
-</script>
 
+  for (let i = 0; i < userStore.users.length; i++) {
+    if (userStore.users[i].name === name.value) {
+      error.value = "Un utilisateur avec ce nom existe déjà";
+      return;
+    }
+  }
+
+  const response = await userStore.addUser(
+    jwtStore.jwt,
+    name.value,
+    password.value,
+    role.value
+  );
+  if (response) {
+    await userStore.setUsers(jwtStore.jwt);
+    alert("L'utilisateur a bien été ajouté");
+    emit("close");
+    location.hash = "#user-list";
+  }
+};
+</script>
 <style scoped>
 .modal-mask {
   content: "";
@@ -121,17 +114,6 @@ async function addTask() {
   cursor: pointer;
   align-self: flex-end;
 }
-
-.content-private {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.content-private label {
-  margin-left: 8px !important;
-}
-
 label {
   color: white;
   padding-bottom: 0;
@@ -200,6 +182,10 @@ form {
 .btnSubmitStyle:hover {
   background-color: #6c7cff;
   border: 1px solid #6c7cff;
+}
+
+.error {
+  color: #ee2020;
 }
 
 .fade-enter-active,

@@ -7,9 +7,10 @@ const editTask = defineEventHandler(async (event) => {
   const id = parseInt(event.context.params.id);
   // get the body of the request and asign its parameters to variables
   const body = await readBody(event);
-  const title = body.title ? body.title : null;
-  const content = body.content ? body.content : null;
-  const completed  = body.completed;
+  const title : string = body.title ? body.title : null;
+  const content : string = body.content ? body.content : null;
+  const completed : boolean  = body.completed;
+  const isContentPrivate : boolean = body.isContentPrivate;
   //get the token from the request headers
   const auth = event.req.headers.authorization;
   const token = auth !== undefined ? auth.split(" ")[1] : null;
@@ -23,7 +24,7 @@ const editTask = defineEventHandler(async (event) => {
       throw "No token provided";
     }
     const decoded: string | JwtPayload = jwt.verify(token, "shhhhhhh");
-    if (!decoded) {
+    if (!decoded || typeof decoded === "string") {
       throw "Invalid token";
     }
     // check if the user exists and throw an error if it doesn't
@@ -58,6 +59,7 @@ const editTask = defineEventHandler(async (event) => {
         title: title ? title : task.title,
         content: content ? content : task.content,
         completed: completed,
+        isContentPrivate: isContentPrivate,
         updatedAt: new Date(),
       },
     });

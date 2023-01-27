@@ -34,7 +34,7 @@
             edit
           </span>
         </div>
-        <p class="content">
+        <p class="content" v-if="!task.isContentPrivate || jwtStore.jwt">
           {{ task.content }}
         </p>
 
@@ -67,6 +67,10 @@ if (!tasks) {
 }
 
 async function deleteTask(id) {
+  const conf = confirm("Voulez-vous vraiment supprimer cette tâche ?");
+  if (!conf) {
+    return;
+  }
   const res = await fetch("http://localhost:3000/api/task/" + id, {
     //await fait attendre que toute la fonction soit déroulée
     headers: {

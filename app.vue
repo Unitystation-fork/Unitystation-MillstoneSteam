@@ -1,6 +1,10 @@
 <template>
   <div class="body">
     <Header @login="show" id="top" />
+    <Warning
+      v-if="jwtStore.jwt && showWarning"
+      @closeWarning="showWarning = false"
+    />
     <div class="btns">
       <button
         v-if="jwtStore.role === 'ADMIN' && jwtStore.jwt"
@@ -10,12 +14,27 @@
         <span class="material-symbols-outlined"> note_add </span> Ajouter une
         tâche
       </button>
+      <button
+        v-if="jwtStore.role === 'ADMIN' && jwtStore.jwt"
+        class="add-person-btn"
+        @click="showAddUser = true"
+      >
+        <span class="material-symbols-outlined" @click="showAddUser = true">
+          person_add</span
+        >
+        Ajouter un utilisateur
+      </button>
     </div>
     <LoginForm :show-form="showForm" @close="closeForm" />
     <TaskList />
+    <UserList v-if="jwtStore.jwt && jwtStore.role === 'ADMIN'" />
     <AddTaskForm
-      v-if="showAddTask && jwtStore.role === 'ADMIN'"
+      v-if="showAddTask && jwtStore.role === 'ADMIN' && jwtStore.jwt"
       @close="showAddTask = false"
+    />
+    <AddUserForm
+      v-if="showAddUser && jwtStore.role === 'ADMIN' && jwtStore.jwt"
+      @close="showAddUser = false"
     />
     <a href="#top" v-if="showScrollToTop"
       ><img
@@ -32,7 +51,9 @@ import { useJwtStore } from "./stores/jwt";
 
 const showForm = ref(false);
 const showAddTask = ref(false);
+const showAddUser = ref(false);
 const showScrollToTop = ref(false);
+const showWarning = ref(true);
 const show = () => {
   showForm.value = true;
 };
@@ -83,6 +104,11 @@ button {
   margin: 10px;
   cursor: pointer;
   padding: 0.4em;
+}
+
+button:hover {
+  background-color: #6c7cff;
+  border: 1px solid #6c7cff;
 }
 
 .material-symbols-outlined {
