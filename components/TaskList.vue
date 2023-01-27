@@ -9,7 +9,7 @@
         Terminer les modifications
       </button>
       <div class="tasks" v-for="task in taskStore.tasks" :key="task.id">
-        <div class="task-title">
+        <div class="task-title" :id="task.id">
           <h2>
             {{ task.id }}.
             {{ task.title }}
@@ -29,7 +29,7 @@
             class="material-symbols-outlined edit-btn"
             :class="task.id"
             v-if="jwtStore.role == 'ADMIN'"
-            @click="isModifShown = true"
+            @click="scrollToTask(task.id)"
           >
             edit
           </span>
@@ -60,6 +60,12 @@ const jwtStore = useJwtStore();
 const isModifShown = ref(false);
 const error = ref("");
 const deleteError = ref("");
+
+const scrollToTask = (id) => {
+  const task = document.getElementById(id);
+  task.scrollIntoView({ behavior: "smooth" });
+  isModifShown.value = true;
+};
 
 if (!tasks) {
   error.value =
