@@ -29,7 +29,13 @@ const users = defineEventHandler(async (event) => {
       throw "You do not have the permission to get all users";
     }
     // get all users from the database and return them
-    const users = await prisma.user.findMany({});
+    const users = await prisma.user.findMany({
+       select: {
+         name: true,
+         id: true,
+         role: true,
+      } 
+    });
     return {
       statusCode: 200,
       body: { users },
