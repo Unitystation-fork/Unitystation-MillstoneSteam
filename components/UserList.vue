@@ -24,18 +24,14 @@
               class="material-symbols-outlined edit-btn edit"
               :class="user.id"
               v-if="!showModifUserForm"
-              @click="
-                (showModifUserForm = true) && (location.hash = '#' + user.id)
-              "
+              @click="scrollToUser(user.id)"
             >
               edit
             </span>
             <ModifUser
               v-bind="user"
               v-if="showModifUserForm"
-              @close="
-                showModifUserForm = false && (location.hash = '#' + user.id)
-              "
+              @close="showModifUserForm = false"
               @errorOnUpdateUser="
                 error = `La modification de l'utilisateur ${user.name} a échoué.`
               "
@@ -64,7 +60,12 @@ const jwt = jwtStore.jwt;
 const users = await userStore.setUsers(jwt);
 const showModifUserForm = ref(false);
 const error = ref("");
-const location = Location;
+
+const scrollToUser = (id) => {
+  const user = document.getElementById(id);
+  showModifUserForm.value = !showModifUserForm.value;
+  user.scrollIntoView({ behavior: "smooth" });
+};
 
 if (users === false) {
   error.value =
