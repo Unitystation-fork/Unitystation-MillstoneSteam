@@ -86,13 +86,13 @@ export const useUserStore = defineStore("users", {
                 });
             if (res.statusCode !== 200) {
                 if (res.body.error === "Invalid token") {
-                    return alert("Vous n'êtes pas autorisé à modifier cette tâche.");
+                    return alert("Vous n'êtes pas autorisé à supprimer un utilisateur.");
                 }
                 if (res.body.error === "Expired token") {
                     return alert("Votre session a expiré, veuillez vous reconnecter.");
                 } else {
                     return alert(
-                        "Une erreur est survenue lors de la suppression de la tâche."
+                        "Une erreur est survenue lors de la suppression de l'utilisateur."
                     );
                 }
             }
