@@ -18,9 +18,6 @@ OnePage MillstoneSteam
 ├── [Usage](#usage)  
 │....├── [Options pour le ou les admins :](#options-pour-le-ou-les-admins)  
 │....└── [Options pour les autres utilisateurs :](#options-pour-les-autres-utilisateurs)  
-└── [ToDo](#todo)  
-....├── [Prototype visuel](#prototype-visuel)  
-....└── [Liste des taches](#liste-des-taches)  
 
 ### Langages utilisés
 
@@ -139,37 +136,6 @@ cd /xxxx
 
 ### ToDo
 
-! [TODO](https://github.com/orgs/Unitystation-fork/projects/1/views/4?visibleFields=%5B%22Repository%22%2C20977185%2C%22Title%22%2C%22Labels%22%2C%22Assignees%22%2C%22Status%22%5D)
-
-#### Prototype visuel
-
-![](https://raw.githubusercontent.com/Unitystation-fork/Unitystation-MillstoneSteam/f1c3af75612b74685ed4ea3d72b65f597e01fd62/Images/2022-10-06-163647_1920x1080_scrot.png)
-
-#### Liste des taches
-
-- :page_facing_up:Pitch d'accoche, Pitch Minute
-- :page_facing_up:Press-kit
-- :discord: Rassembler une base de streamer et joueurs en une liste propre avec Job préférences.
-- :discord: Canaux vocaux discord par département/zone
-- :page_facing_up:  Préparé une liste de règles et instruction streamer/viewer
-- :OBS: Scene streamer avec tuto
-- :server: Configuré un serveur local
-- :langage_web: Traduire documentation (ajout de loi)
-- :question: Niveau Tutoriel Solo
-- :question: Tutoriel Français, Anglais, Allemand, Russe
-
-- :discord: Annonces Invitation joueurs
-- :calendar: Doodle des participant
-- :twitch~1: Stream Entrainement "security"
-- :discord: De-Briefing
-- :microphone2: Voice Proximity Chat
-
-- :discord: Rôles streamer unitystation
-- :discord: Section FR Unitystation
-
-- :discord: Annonces Invitation joueurs
-- :calendar: Doodle des participant
-- :twitch~1: Stream collaboratif
-- :discord: De-Briefing
+! Si vous souhaitez participer à ce projet ou un autre projet de l'UDR, vous trouverez ici des tâches à réaliser : [TODO](https://github.com/orgs/Unitystation-fork/projects/1/views/4?visibleFields=%5B%22Repository%22%2C20977185%2C%22Title%22%2C%22Labels%22%2C%22Assignees%22%2C%22Status%22%5D)
 
 -------------
