@@ -19,8 +19,7 @@ export const useTaskStore = defineStore("tasks", {
         console.log("error", res);
         return false;
       }
-      //sort tasks by status
-
+      //sort tasks by status (completed first)
       this.tasks = res.body.tasks.sort((a, b) => {
         if (a.completed < b.completed) {
           return 1;
