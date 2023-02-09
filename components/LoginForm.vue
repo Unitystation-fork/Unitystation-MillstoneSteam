@@ -72,18 +72,14 @@ const login = async () => {
       name: username.value,
       password: password.value,
     }),
-  })
-    .then((r) => r.json())
-    .catch((e) => {
-      error.value = e.message;
-      console.log(e);
-    });
-  if (res.statusCode === 200) {
-    jwtStore.setJwt(res.body.token);
-    jwtStore.setRole(res.body.role);
-    console.log("Logged in");
-    emit("close");
+  }).then((r) => r.json());
+  if (res.statusCode !== 200) {
+    error.value = res.message;
+    return;
   }
+  jwtStore.setJwt(res.body.token);
+  jwtStore.setRole(res.body.role);
+  emit("close");
 };
 
 const handleChange = () => {
@@ -131,6 +127,7 @@ form {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 1em;
 }
 
 label {
