@@ -62,9 +62,11 @@ const showModifUserForm = ref(false);
 const error = ref("");
 
 const scrollToUser = (id) => {
-  const user = document.getElementById(id);
   showModifUserForm.value = !showModifUserForm.value;
-  user.scrollIntoView({ behavior: "smooth" });
+  const user = document.getElementById(id);
+  setTimeout(() => {
+    user.scrollIntoView({ behavior: "smooth" });
+  }, 10);
 };
 
 if (users === false) {
