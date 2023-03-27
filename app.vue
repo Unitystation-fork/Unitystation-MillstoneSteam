@@ -5,20 +5,13 @@
       v-if="jwtStore.jwt && showWarning"
       @closeWarning="showWarning = false"
     />
-    <div class="btns">
-      <button
-        v-if="jwtStore.role === 'ADMIN' && jwtStore.jwt"
-        class="add-task-btn"
-        @click="showAddTask = true"
-      >
+    <ProgressBar v-if="tasks" />
+    <div class="btns" v-if="jwtStore.role === 'ADMIN' && jwtStore.jwt">
+      <button class="add-task-btn" @click="showAddTask = true">
         <span class="material-symbols-outlined"> note_add </span> Ajouter une
         tâche
       </button>
-      <button
-        v-if="jwtStore.role === 'ADMIN' && jwtStore.jwt"
-        class="add-person-btn"
-        @click="showAddUser = true"
-      >
+      <button class="add-person-btn" @click="showAddUser = true">
         <span class="material-symbols-outlined" @click="showAddUser = true">
           person_add</span
         >
@@ -48,7 +41,11 @@
 
 <script setup>
 import { useJwtStore } from "./stores/jwt";
+import { useTaskStore } from "./stores/task";
 
+const jwtStore = useJwtStore();
+const taskStore = useTaskStore();
+const tasks = await taskStore.setTasks();
 const showForm = ref(false);
 const showAddTask = ref(false);
 const showAddUser = ref(false);
@@ -57,8 +54,6 @@ const showWarning = ref(true);
 const show = () => {
   showForm.value = true;
 };
-
-const jwtStore = useJwtStore();
 
 const closeForm = () => {
   showForm.value = false;
@@ -102,6 +97,7 @@ html {
   display: flex;
   margin-top: 5rem;
   justify-content: center;
+  height: 64px;
 }
 
 button {
