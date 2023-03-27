@@ -44,7 +44,7 @@
           class="modif-form"
         />
       </div>
-      <button v-if="isModifShown" @click="isModifShown = false">
+      <button v-if="isModifShown" @click="endTaskEdit">
         Terminer les modifications
       </button>
     </div>
@@ -59,12 +59,26 @@ const tasks = await taskStore.setTasks();
 const jwtStore = useJwtStore();
 const isModifShown = ref(false);
 const error = ref("");
-const deleteError = ref("");
+
+const endTaskEdit = () => {
+  taskStore.tasks.sort((a, b) => {
+    if (a.completed < b.completed) {
+      return 1;
+    }
+    if (a.completed > b.completed) {
+      return -1;
+    }
+    return 0;
+  });
+  isModifShown.value = false;
+};
 
 const scrollToTask = (id) => {
-  const task = document.getElementById(id);
-  task.scrollIntoView({ behavior: "smooth" });
   isModifShown.value = true;
+  const task = document.getElementById(id);
+  setTimeout(() => {
+    task.scrollIntoView({ behavior: "smooth" });
+  }, 10);
 };
 
 if (!tasks) {
@@ -73,38 +87,11 @@ if (!tasks) {
 }
 
 async function deleteTask(id) {
-  const conf = confirm("Voulez-vous vraiment supprimer cette tâche ?");
-  if (!conf) {
-    return;
+  const res = await taskStore.deleteTask(jwtStore.jwt, id);
+  if (res !== "ok") {
+    alert(res);
   }
-  const res = await fetch("http://localhost:3000/api/task/" + id, {
-    //await fait attendre que toute la fonction soit déroulée
-    headers: {
-      Authorization: "Bearer " + jwtStore.jwt,
-    },
-    method: "DELETE",
-  })
-    .then((r) => r.json())
-    .catch((e) => {
-      deleteError.value = e.message;
-      console.log(e);
-    });
-
-  if (res.statusCode !== 200) {
-    console.log(res.body);
-    if (res.body.error === "Invalid token") {
-      deleteError.value = "Vous n'êtes pas autorisé à modifier cette tâche.";
-    }
-    if (res.body.error === "Expired token") {
-      deleteError.value = "Votre session a expiré, veuillez vous reconnecter.";
-    } else {
-      deleteError.value =
-        "Une erreur est survenue lors de la suppression de la tâche.";
-    }
-    alert(deleteError.value);
-    return;
-  }
-  await taskStore.setTasks();
+  return;
 }
 </script>
 

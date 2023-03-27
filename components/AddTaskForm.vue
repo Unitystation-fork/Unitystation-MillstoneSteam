@@ -57,7 +57,7 @@ const error = ref("");
 const taskStore = useTaskStore();
 const emit = defineEmits(["close"]);
 
-async function addTask() {
+const addTask = async () => {
   if (title.value.length === 0 || content.value.length === 0) {
     error.value = "Veuillez remplir tous les champs";
     return;
@@ -66,41 +66,18 @@ async function addTask() {
     error.value = "Veuillez vous connecter";
     return;
   }
-
-  const res = await fetch("http://localhost:3000/api/task", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + jwtStore.jwt,
-    },
-
-    body: JSON.stringify({
-      title: title.value,
-      content: content.value,
-      isContentPrivate: isContentPrivate.value,
-    }),
-  })
-    .then((r) => r.json())
-    .catch((e) => {
-      error.value = e;
-    });
-  if (res.statusCode !== 200) {
-    console.log(res.body.error);
-    if (res.body.error === "Invalid token") {
-      error.value = "Vous n'êtes pas autorisé à modifier cette tâche.";
-      return;
-    }
-    if (res.body.error === "Expired token") {
-      error.value = "Votre session a expiré, veuillez vous reconnecter.";
-      return;
-    }
-    error.value =
-      "Une erreur est survenue lors de la modification de la tâche.";
+  const res = await taskStore.addTask(
+    jwtStore.jwt,
+    title.value,
+    content.value,
+    isContentPrivate.value
+  );
+  if (res !== "ok") {
+    error.value = res;
     return;
   }
-  await taskStore.setTasks();
   emit("close");
-}
+};
 </script>
 
 <style scoped>

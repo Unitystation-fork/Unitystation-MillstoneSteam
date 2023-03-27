@@ -57,43 +57,21 @@ const error = ref("");
 
 const emit = defineEmits(["close"]);
 
-async function updateTask() {
-  const res = await fetch("http://localhost:3000/api/task/" + id, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + jwtStore.jwt,
-    },
-    body: JSON.stringify({
-      title: titleInput.value,
-      content: contentInput.value,
-      completed: completedInput.value,
-      isContentPrivate: isContentPrivateInput.value,
-    }),
-  })
-    .then((r) => r.json())
-    .catch((e) => {
-      error.value = e.message;
-      console.log(e);
-    });
-
-  if (res.statusCode !== 200) {
-    console.log(res.body);
-    if (res.body.error === "Invalid token") {
-      error.value = "Vous n'êtes pas autorisé à modifier cette tâche.";
-      return;
-    }
-    if (res.body.error === "Expired token") {
-      error.value = "Votre session a expiré, veuillez vous reconnecter.";
-      return;
-    }
-    error.value =
-      "Une erreur est survenue lors de la modification de la tâche.";
+const updateTask = async () => {
+  const res = await taskStore.updateTask(
+    jwtStore.jwt,
+    id,
+    titleInput.value,
+    contentInput.value,
+    completedInput.value,
+    isContentPrivateInput.value
+  );
+  if (res !== "ok") {
+    error.value = res;
     return;
   }
-  await taskStore.setTasks();
   emit("close");
-}
+};
 </script>
 
 <style>
