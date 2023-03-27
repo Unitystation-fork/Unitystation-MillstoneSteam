@@ -36,7 +36,7 @@
       v-if="showAddUser && jwtStore.role === 'ADMIN' && jwtStore.jwt"
       @close="showAddUser = false"
     />
-    <a href="#top" v-if="showScrollToTop"
+    <a href="" v-if="showScrollToTop" @click.prevent="scrollToTop"
       ><img
         class="scroll-to-top"
         src="./assets/img/arrow_up.png"
@@ -72,12 +72,23 @@ if (typeof window !== "undefined")
       showScrollToTop.value = false;
     }
   };
+
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+};
 </script>
 
 <style scoped>
 * {
   font-family: "Ubuntu", sans-serif;
   color: white;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 .body {
   background-color: #171e27;
