@@ -55,7 +55,9 @@
 import { useTaskStore } from "~/stores/task";
 import { useJwtStore } from "~~/stores/jwt";
 const taskStore = useTaskStore();
-const tasks = await taskStore.setTasks();
+const tasks = taskStore.tasks.value
+  ? taskStore.tasks.value
+  : await taskStore.setTasks();
 const jwtStore = useJwtStore();
 const isModifShown = ref(false);
 const error = ref("");
