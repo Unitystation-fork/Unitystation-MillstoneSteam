@@ -5,6 +5,12 @@
       v-if="jwtStore.jwt && showWarning"
       @closeWarning="showWarning = false"
     />
+    <p class="presentation">
+      Cette page est là pour vous permettre de suivre les activités de l'Union
+      des Rôlistes, plus particulièrement l'avancée de ses missions relatives au
+      jeu UnityStation, qu'il s'agisse d'une participation au développement du
+      jeu, d'activités liées ou d'évènements de streaming.
+    </p>
     <ProgressBar v-if="tasks" />
     <div class="btns" v-if="jwtStore.role === 'ADMIN' && jwtStore.jwt">
       <button class="add-task-btn" @click="showAddTask = true">
@@ -92,6 +98,16 @@ html {
   left: 0;
   right: 0;
   display: column;
+}
+
+.presentation {
+  text-align: left;
+  margin-top: 5rem;
+  margin-bottom: 5rem;
+  font-size: 1.2em;
+  width: 75vw;
+  margin-left: auto;
+  margin-right: auto;
 }
 .btns {
   display: flex;
