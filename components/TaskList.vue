@@ -160,7 +160,7 @@ button:hover {
   padding-left: 1.8rem;
   padding-right: 1.2rem;
   border-radius: 3px;
-  min-width: 700px;
+  min-width: 75vw;
   max-width: 750px;
 }
 
@@ -173,10 +173,11 @@ button:hover {
   align-items: center;
   width: 100%;
   padding-bottom: 0.7rem;
+  flex-wrap: wrap;
 }
 
 h2 {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   margin: 0;
 }
 .status {

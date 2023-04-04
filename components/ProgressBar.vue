@@ -76,17 +76,18 @@ li {
   align-items: center;
   height: 100%;
   margin-top: 64px;
+  max-width: 90vw;
 }
 
 .finished-task {
   background-color: transparent;
-  width: 5vw;
+  width: 4vw;
   height: 32px;
 }
 
 .unfinished-task {
   background-color: transparent;
-  width: 5vw;
+  width: 4vw;
   height: 32px;
 }
 
