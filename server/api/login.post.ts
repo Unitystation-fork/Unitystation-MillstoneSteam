@@ -27,7 +27,7 @@ const login = defineEventHandler(async (event) => {
             statusMessage: 'Mot de passe incorrect.',
         };
     }
-    const token = jwt.sign({id: user.id}, "shhhhhhh", {expiresIn : "5h"});
+    const token = jwt.sign({id: user.id}, process.env.JWT_SECRET, {expiresIn : "5h"});
     await prisma.user.update({
         where: {
             id: user.id,

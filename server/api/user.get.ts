@@ -10,7 +10,7 @@ const users = defineEventHandler(async (event) => {
     if (!token || token === null) {
       throw "No token provided";
     }
-    const decoded: string | JwtPayload = jwt.verify(token, "shhhhhhh");
+    const decoded: string | JwtPayload = jwt.verify(token, process.env.JWT_SECRET);
     if (!decoded || typeof decoded === "string") {
       throw "Invalid token";
     }
