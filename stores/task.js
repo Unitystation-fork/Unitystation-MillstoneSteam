@@ -7,9 +7,12 @@ export const useTaskStore = defineStore("tasks", {
 
   actions: {
     async setTasks() {
-      const res = await fetch("http://localhost:3000/api/task", {
-        method: "GET",
-      })
+      const res = await fetch(
+        "http://milestone.unionrolistes.fr:3000/api/task",
+        {
+          method: "GET",
+        }
+      )
         .then((r) => r.json())
         .catch((e) => {
           console.log("error", e);
@@ -34,18 +37,21 @@ export const useTaskStore = defineStore("tasks", {
 
     async addTask(jwt, title, content, completed) {
       console.log("addTask", title, content, completed, jwt);
-      const res = await fetch("http://localhost:3000/api/task", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + jwt,
-        },
-        body: JSON.stringify({
-          title,
-          content,
-          completed,
-        }),
-      })
+      const res = await fetch(
+        "http://milestone.unionrolistes.fr:3000/api/task",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + jwt,
+          },
+          body: JSON.stringify({
+            title,
+            content,
+            completed,
+          }),
+        }
+      )
         .then((r) => r.json())
         .catch((e) => {
           console.log("error", e);
@@ -66,19 +72,22 @@ export const useTaskStore = defineStore("tasks", {
     },
 
     async updateTask(jwt, id, title, content, completed, isContentPrivate) {
-      const res = await fetch("http://localhost:3000/api/task/" + id, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + jwt,
-        },
-        body: JSON.stringify({
-          title,
-          content,
-          completed,
-          isContentPrivate,
-        }),
-      })
+      const res = await fetch(
+        "http://milestone.unionrolistes.fr:3000/api/task/" + id,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + jwt,
+          },
+          body: JSON.stringify({
+            title,
+            content,
+            completed,
+            isContentPrivate,
+          }),
+        }
+      )
         .then((r) => r.json())
         .catch((e) => {
           error.value = e.message;
@@ -108,13 +117,16 @@ export const useTaskStore = defineStore("tasks", {
       if (!conf) {
         return;
       }
-      const res = await fetch("http://localhost:3000/api/task/" + id, {
-        //await fait attendre que toute la fonction soit déroulée
-        headers: {
-          Authorization: "Bearer " + jwt,
-        },
-        method: "DELETE",
-      })
+      const res = await fetch(
+        "http://milestone.unionrolistes.fr:3000/api/task/" + id,
+        {
+          //await fait attendre que toute la fonction soit déroulée
+          headers: {
+            Authorization: "Bearer " + jwt,
+          },
+          method: "DELETE",
+        }
+      )
         .then((r) => r.json())
         .catch((e) => {
           deleteError.value = e.message;
