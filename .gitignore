@@ -8,3 +8,4 @@ node_modules
 .vite
 .env
 dist
+milestone.db
