@@ -6,7 +6,6 @@ services:
     build: .
     env_file:
       - .env
-      - .default
     image: app
     container_name: app
     ports:
