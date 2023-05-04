@@ -1,28 +1,31 @@
 {
-  "private": true,
-  "prisma": {
-    "seed": "node prisma/seed.js"
-  },
-  "scripts": {
-    "build": "nuxt build",
-    "dev": "nuxt dev",
-    "generate": "nuxt generate",
-    "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
-  },
-  "devDependencies": {
-    "@types/bcrypt": "^5.0.0",
-    "@types/jsonwebtoken": "^9.0.0",
-    "nuxt": "3.0.0-rc.12",
-    "prisma": "^4.5.0"
-  },
-  "dependencies": {
-    "@pinia/nuxt": "^0.4.3",
-    "@prisma/client": "^4.5.0",
-    "bcrypt": "^5.1.0",
-    "dotenv": "^16.0.3",
-    "jsonwebtoken": "^9.0.0",
-    "pinia": "^2.0.23",
-    "pinia-plugin-persistedstate": "^2.3.0"
-  }
+    "private": true,
+    "prisma": {
+        "seed": "node prisma/seed.js"
+    },
+    "scripts": {
+        "build": "nuxt build",
+        "dev": "nuxt dev",
+        "generate": "nuxt generate",
+        "preview": "nuxt preview",
+        "postinstall": "nuxt prepare",
+        "start": "nuxt start"
+    },
+    "devDependencies": {
+        "@types/bcrypt": "^5.0.0",
+        "@types/jsonwebtoken": "^9.0.0",
+        "nuxt": "^3.0.0-rc.14",
+        "prisma": "^4.5.0"
+    },
+    "dependencies": {
+        "@nuxtjs/sentry": "^6.0.1",
+        "@pinia/nuxt": "^0.4.3",
+        "@prisma/client": "^4.5.0",
+        "bcrypt": "^5.1.0",
+        "dotenv": "^16.0.3",
+        "jsonwebtoken": "^9.0.0",
+        "nuxt-start": "^2.15.8",
+        "pinia": "^2.0.23",
+        "pinia-plugin-persistedstate": "^2.3.0"
+    }
 }
