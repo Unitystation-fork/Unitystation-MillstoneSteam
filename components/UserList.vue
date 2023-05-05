@@ -15,7 +15,11 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="user in userStore.users" :key="user.id" :id="user.id">
+        <tr
+          v-for="user in userStore.users"
+          :key="user.id"
+          :id="'user' + user.id"
+        >
           <td>{{ user.id }}</td>
           <td>{{ user.name }}</td>
           <td>{{ user.role }}</td>
@@ -24,7 +28,7 @@
               class="material-symbols-outlined edit-btn edit"
               :class="user.id"
               v-if="!showModifUserForm"
-              @click="scrollToUser(user.id)"
+              @click="scrollToUser('user' + user.id)"
             >
               edit
             </span>
@@ -64,6 +68,7 @@ const error = ref("");
 const scrollToUser = (id) => {
   showModifUserForm.value = !showModifUserForm.value;
   const user = document.getElementById(id);
+  console.log(user);
   setTimeout(() => {
     user.scrollIntoView({ behavior: "smooth" });
   }, 10);
