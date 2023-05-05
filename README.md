@@ -59,7 +59,7 @@ Pouvoir consulter, de manière simple, les points dans la progression :
 
 #### Mode Admin
 
-- Pouvoir ajouter, supprimer, modifier l'état des points "millestone"
+- Pouvoir ajouter, supprimer, modifier l'état des points "milestone"
 
 -------------
 
