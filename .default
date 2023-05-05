@@ -1,0 +1,5 @@
+# This is an example of .env file whith the variables it must contain
+
+ADMIN_NAME="xxxxxx"
+ADMIN_PASSWORD="$2b$10$xxxxxxxxxxx"
+JWT_SECRET="xxxxxxx"

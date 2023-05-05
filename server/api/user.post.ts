@@ -15,8 +15,8 @@ try {
   if (!token) {
     throw "No token provided";
   }
-  const decoded: string | JwtPayload = jwt.verify(token, "shhhhhhh");
-  if (!decoded) {
+  const decoded: string | JwtPayload = jwt.verify(token, process.env.JWT_SECRET);
+  if (!decoded || typeof decoded === "string") {
     throw "Invalid token";
   }
   // check if the user exists and throw an error if it doesn't
