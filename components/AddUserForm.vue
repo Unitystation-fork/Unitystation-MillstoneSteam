@@ -85,8 +85,8 @@ const addUser = async () => {
   const response = await userStore.addUser(
     jwtStore.jwt,
     name.value,
-    password.value,
-    role.value
+    role.value,
+    password.value
   );
   if (response) {
     await userStore.setUsers(jwtStore.jwt);
