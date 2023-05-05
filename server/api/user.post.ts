@@ -7,6 +7,7 @@ const createUser = defineEventHandler(async (event) => {
   // get the body of the request and asign its parameters to variables
   const body = await readBody(event);
   const name = body.name;
+  const role = body.role;
   const password = await bcrypt.hash(body.password, 10);
   const auth = event.req.headers.authorization;
   const token = (auth !== undefined) ?  auth.split(" ")[1] : null;
@@ -50,6 +51,7 @@ try {
     data: {
       name: name,
       password: password,
+      role: role,
     }
   });
   return {
