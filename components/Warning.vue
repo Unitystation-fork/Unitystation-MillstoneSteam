@@ -3,8 +3,8 @@
     <span class="material-symbols-outlined"> warning </span>
     <p>
       Les liens présents sous les différentes tâches sont confidentiels et, en
-      les consultant, vous vous engagez à ne pas les divulguer sans quoi vous ne
-      pourrez plus vous connecter à cette page.
+      les consultant, vous vous engagez à ne pas les divulguer sans quoi vous
+      serez banni de ce projet.
     </p>
     <span class="material-symbols-outlined close" @click="$emit('closeWarning')"
       >close</span
@@ -25,6 +25,8 @@ div {
   align-items: center;
   justify-content: center;
   gap: 1em;
+  font-size: 1.2rem;
+  font-weight: 600;
 }
 
 .close {
