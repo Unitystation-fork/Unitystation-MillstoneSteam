@@ -24,12 +24,11 @@ export const useUserStore = defineStore("users", {
       if (res.statusCode !== 200) {
         console.log("error", res);
         if (res.body.error === "Invalid token") {
-          alert("Vous n'êtes pas autorisé consulter un utilisateur.");
+          return "Vous n'êtes pas autorisé consulter un utilisateur.";
         }
         if (res.body.error === "Expired token") {
-          alert("Votre session a expiré, veuillez vous reconnecter.");
+          return "Votre session a expiré, veuillez vous reconnecter.";
         }
-        return false;
       }
       this.users = res.body.users;
       return true;
