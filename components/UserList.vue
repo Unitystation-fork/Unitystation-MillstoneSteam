@@ -4,6 +4,7 @@
     <span class="error" v-if="!users && error !== ''"
       >Une erreur est survenue. Utilisateurs impossible à afficher.</span
     >
+    <p class="error" v-if="error !== ''">{{ error }}</p>
     <table v-if="users">
       <thead>
         <tr>
@@ -77,6 +78,10 @@ const scrollToUser = (id) => {
 if (users === false) {
   error.value =
     "Une erreur est survenue durant l'affichage des utilisateurs. Veuillez réessayer ultérieurement.";
+}
+
+if (typeof users == "string") {
+  error.value = users;
 }
 
 const deleteUser = async (id) => {
