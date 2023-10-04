@@ -2,21 +2,14 @@
   <div class="body">
     <Header @login="show" />
     <div class="btns">
-      <button
-        v-if="jwtStore.role === 'ADMIN' && jwtStore.jwt"
-        class="add-task-btn"
-        @click="showAddTask = true"
-      >
+      <button v-if="jwtStore.role === 'ADMIN' && jwtStore.jwt" class="add-task-btn" @click="showAddTask = true">
         <span class="material-symbols-outlined"> note_add </span> Ajouter une
         tâche
       </button>
     </div>
     <LoginForm :show-form="showForm" @close="closeForm" />
     <TaskList />
-    <AddTaskForm
-      v-if="showAddTask && jwtStore.role === 'ADMIN'"
-      @close="showAddTask = false"
-    />
+    <AddTaskForm v-if="showAddTask && jwtStore.role === 'ADMIN'" @close="showAddTask = false" />
     <Footer />
   </div>
 </template>
@@ -41,6 +34,7 @@ const closeForm = () => {
   font-family: "Ubuntu", sans-serif;
   color: white;
 }
+
 .body {
   background-color: #171e27;
   position: absolute;
@@ -49,6 +43,7 @@ const closeForm = () => {
   right: 0;
   display: column;
 }
+
 .btns {
   display: flex;
   margin-top: 5rem;

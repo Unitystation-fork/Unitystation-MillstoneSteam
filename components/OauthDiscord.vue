@@ -1,4 +1,4 @@
-<script setup>
+<!-- <script setup>
 const passport = require('passport');
 const { Strategy } = require('passport-discord');
 
@@ -15,4 +15,4 @@ passport.use(
     })
 );
 </script>
-  
+   -->

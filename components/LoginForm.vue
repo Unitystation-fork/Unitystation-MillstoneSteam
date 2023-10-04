@@ -23,11 +23,11 @@
         </div>
         <div class="oauth-icons">
           <a href="#" class="oauth-button discord" @click="redirectToDiscordOAuth">
-            <!-- <img src="../assets/img/discord-icon.png" alt="Discord Icon" /> -->
+            <img src="../assets/img/discord-icon.png" alt="Discord Icon" />
             Se connecter avec Discord
           </a>
           <a href="#" class="oauth-button twitch" @click="redirectToTwitchOAuth">
-            <!-- <img src="/assets/img/twitch-icon.png" alt="Twitch Icon" /> -->
+            <img src="../assets/img/twitch-icon.png" alt="Twitch Icon" />
             Se connecter avec Twitch
           </a>
         </div>
@@ -40,14 +40,15 @@
 
 <script setup>
 import { useJwtStore } from "~~/stores/jwt";
-import dotenv from 'dotenv';
-dotenv.config();
+
 
 const username = ref("");
 const password = ref("");
 const error = ref("");
 const emit = defineEmits(["close"]);
 const jwtStore = useJwtStore();
+
+
 
 defineProps({
   showForm: {
@@ -89,29 +90,32 @@ const handleChange = () => {
   error.value = "";
 };
 
+const runtimeConfig = useRuntimeConfig()
+
+
 const redirectToDiscordOAuth = () => {
-  const discordClientId = import.meta.env.VITE_DISCORD_CLIENT_ID;
-  const discordRedirectUri = import.meta.env.VITE_DISCORD_CLIENT_REDIRECT;
+  const discordClientId = runtimeConfig.discordClientId;
+  const discordRedirectUri = runtimeConfig.discordClientRedirect;
 
-  const discordOAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${discordClientId}&redirect_uri=${discordRedirectUri}&response_type=code&scope=identify`;
-
+  const discordOAuthUrl = `  https://discord.com/api/oauth2/authorize?client_id=${discordClientId}&redirect_uri=${discordRedirectUri}&response_type=code&scope=identify%20guilds`;
+  console.log(discordRedirectUri);
   window.location.href = discordOAuthUrl;
 };
 
 const redirectToTwitchOAuth = () => {
-  const twitchClientId = import.meta.env.VITE_TWITCH_CLIENT_ID;
-  const twitchRedirectUri = import.meta.env.VITE_TWITCH_CLIENT_REDIRECT;
+  const twitchClientId = runtimeConfig.twitchClientId;
+  const twitchRedirectUri = runtimeConfig.twitchClientRedirect;
 
   const twitchOAuthUrl = `https://id.twitch.tv/oauth2/authorize?client_id=${twitchClientId}&redirect_uri=${twitchRedirectUri}&response_type=code&scope=openid`;
 
   window.location.href = twitchOAuthUrl;
 };
 
+
+
 </script>
 
 <style scoped>
-/* Vos styles CSS actuels ... */
-
 .modal-mask {
   content: "";
   position: absolute;
