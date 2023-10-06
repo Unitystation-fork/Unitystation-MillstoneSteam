@@ -1,3 +1,12 @@
+/**
+ * user.post.ts contient la gestion de la création d'utilisateurs.
+ * Lorsqu'une demande POST est reçue, ce gestionnaire vérifie les autorisations,
+ * vérifie si les informations nécessaires sont fournies, puis crée un nouvel utilisateur dans DB.
+ * Prisma pour la base de données,
+ * JWT pour l'authentification.
+ */
+
+
 import { PrismaClient } from "@prisma/client";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import bcrypt from "bcrypt";
