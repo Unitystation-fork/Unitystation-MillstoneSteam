@@ -12,13 +12,15 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  token     String?
-  role      String   @default("USER")
+  id           Int      @id @default(autoincrement())
+  name         String   @unique
+  password     String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  token        String?
+  role         String   @default("USER")
+  discordId    String?
+  twitchId     String?
 }
 
 model Task {
