@@ -1,10 +1,7 @@
 <template>
   <div class="body">
     <Header @login="show" id="top" />
-    <Warning
-      v-if="jwtStore.jwt && showWarning"
-      @closeWarning="showWarning = false"
-    />
+    <Warning v-if="jwtStore.jwt && showWarning" @closeWarning="showWarning = false" />
     <p class="presentation">
       Cette page est là pour vous permettre de suivre les activités de l'Union
       des Rôlistes, plus particulièrement l'avancée de ses missions relatives au
@@ -19,28 +16,17 @@
       </button>
       <button class="add-person-btn" @click="showAddUser = true">
         <span class="material-symbols-outlined" @click="showAddUser = true">
-          person_add</span
-        >
+          person_add</span>
         Ajouter un utilisateur
       </button>
     </div>
     <LoginForm :show-form="showForm" @close="closeForm" />
     <TaskList />
     <UserList v-if="jwtStore.jwt && jwtStore.role === 'ADMIN'" />
-    <AddTaskForm
-      v-if="showAddTask && jwtStore.role === 'ADMIN' && jwtStore.jwt"
-      @close="showAddTask = false"
-    />
-    <AddUserForm
-      v-if="showAddUser && jwtStore.role === 'ADMIN' && jwtStore.jwt"
-      @close="showAddUser = false"
-    />
-    <a href="" v-if="showScrollToTop" @click.prevent="scrollToTop"
-      ><img
-        class="scroll-to-top"
-        src="./assets/img/arrow_up.png"
-        alt="scroll-to-top"
-    /></a>
+    <AddTaskForm v-if="showAddTask && jwtStore.role === 'ADMIN' && jwtStore.jwt" @close="showAddTask = false" />
+    <AddUserForm v-if="showAddUser && jwtStore.role === 'ADMIN' && jwtStore.jwt" @close="showAddUser = false" />
+    <a href="" v-if="showScrollToTop" @click.prevent="scrollToTop"><img class="scroll-to-top"
+        src="./assets/img/arrow_up.png" alt="scroll-to-top" /></a>
     <Footer />
   </div>
 </template>
@@ -91,6 +77,7 @@ const scrollToTop = () => {
 html {
   scroll-behavior: smooth;
 }
+
 .body {
   background-color: #171e27;
   position: absolute;
@@ -109,6 +96,7 @@ html {
   margin-left: auto;
   margin-right: auto;
 }
+
 .btns {
   display: flex;
   margin-top: 5rem;

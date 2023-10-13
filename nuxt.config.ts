@@ -25,9 +25,4 @@ export default defineNuxtConfig({
       },
     ],
   ],
-  runtimeConfig: {
-    public: {
-      apiUrl: process.env.NODE_ENV === 'preview' ? process.env.API_URL_PREVIEW : process.env.API_URL,
-    }
-  }
 });

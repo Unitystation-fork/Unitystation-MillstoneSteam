@@ -1,6 +1,11 @@
 import { defineStore, storeToRefs } from "pinia";
-const apiUrl = runtimeConfig.apiUrl;
+import dotenv from 'dotenv';
 
+const envFile = process.env.NODE_ENV === 'development' ? '.env.dev' : '.env.preview';
+dotenv.config({ path: envFile });
+
+const apiUrl = process.env.API_URL;
+console.log(apiUrl);
 export const useUserStore = defineStore("users", {
   state: () => ({
     users: storeToRefs([]),

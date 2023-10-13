@@ -30,13 +30,20 @@
 
 <script setup>
 import { useJwtStore } from "~~/stores/jwt";
+import dotenv from 'dotenv';
+
 
 const username = ref("");
 const password = ref("");
 const error = ref("");
 const emit = defineEmits(["close"]);
 const jwtStore = useJwtStore();
-const apiUrl = runtimeConfig.apiUrl;
+const envFile = process.env.NODE_ENV === 'development' ? '.env.dev' : '.env.preview';
+dotenv.config({ path: envFile });
+
+const apiUrl = process.env.API_URL;
+console.log(apiUrl);
+
 
 
 defineProps({
