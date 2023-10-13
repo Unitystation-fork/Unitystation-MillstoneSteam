@@ -13,26 +13,13 @@
         <h2>Connexion</h2>
         <div class="form-group">
           <label for="password">Nom d'utilisateur</label>
-          <input
-            type="text"
-            class="form-control"
-            id="username"
-            aria-describedby="usernameHelp"
-            placeholder="Votre nom d'utilisateur"
-            v-model="username"
-            @keyup="handleChange"
-          />
+          <input type="text" class="form-control" id="username" aria-describedby="usernameHelp"
+            placeholder="Votre nom d'utilisateur" v-model="username" @keyup="handleChange" />
         </div>
         <div class="form-group">
           <label for="password">Mot de passe</label>
-          <input
-            type="password"
-            class="form-control"
-            id="exampleInputPassword1"
-            placeholder="Votre mot de passe"
-            v-model="password"
-            @keyup="handleChange"
-          />
+          <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Votre mot de passe"
+            v-model="password" @keyup="handleChange" />
         </div>
         <input type="submit" value="Connexion" />
         <span class="error" v-if="error !== ''">{{ error }}</span>
@@ -63,7 +50,7 @@ const login = async () => {
     return;
   }
 
-  const res = await fetch("http://milestone.unionrolistes.fr:3000/api/login", {
+  const res = await fetch("http://localhost:3000/api/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
