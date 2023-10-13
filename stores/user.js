@@ -13,7 +13,7 @@ export const useUserStore = defineStore("users", {
   actions: {
     async setUsers(jwt) {
       const res = await fetch(
-        `http://${apiUrl}/api/user`,
+        `${apiUrl}/api/user`,
         {
           method: "GET",
           headers: {
@@ -42,7 +42,7 @@ export const useUserStore = defineStore("users", {
 
     async addUser(jwt, name, role, password) {
       const res = await fetch(
-        `http://${apiUrl}/api/user`,
+        `${apiUrl}/api/user`,
         {
           method: "POST",
           headers: {
@@ -84,7 +84,7 @@ export const useUserStore = defineStore("users", {
         return;
       }
       const res = await fetch(
-        `http://${apiUrl}/api/user/${id}`,
+        `${apiUrl}/api/user/${id}`,
         {
           method: "DELETE",
           headers: {
@@ -117,7 +117,7 @@ export const useUserStore = defineStore("users", {
 
     async updateUser(jwt, id, name, role, password) {
       const res = await fetch(
-        `http://${apiUrl}/api/user/${id}`,
+        `${apiUrl}/api/user/${id}`,
         {
           method: "PUT",
           headers: {

@@ -45,7 +45,7 @@ export const useTaskStore = defineStore("tasks", {
     async addTask(jwt, title, content, completed) {
       console.log("addTask", title, content, completed, jwt);
       const res = await fetch(
-        `http://${apiUrl}/api/task`,
+        `${apiUrl}/api/task`,
         {
           method: "POST",
           headers: {
@@ -80,7 +80,7 @@ export const useTaskStore = defineStore("tasks", {
 
     async updateTask(jwt, id, title, content, completed, isContentPrivate) {
       const res = await fetch(
-        `http://${apiUrl}/api/task/${id}`,
+        `${apiUrl}/api/task/${id}`,
         {
           method: "PUT",
           headers: {
@@ -125,7 +125,7 @@ export const useTaskStore = defineStore("tasks", {
         return;
       }
       const res = await fetch(
-        `http://${apiUrl}/api/task/${id}`,
+        `${apiUrl}/api/task/${id}`,
         {
           //await fait attendre que toute la fonction soit déroulée
           headers: {
