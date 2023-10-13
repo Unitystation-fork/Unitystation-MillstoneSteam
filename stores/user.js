@@ -1,4 +1,5 @@
 import { defineStore, storeToRefs } from "pinia";
+const apiUrl = runtimeConfig.apiUrl;
 
 export const useUserStore = defineStore("users", {
   state: () => ({
@@ -7,7 +8,7 @@ export const useUserStore = defineStore("users", {
   actions: {
     async setUsers(jwt) {
       const res = await fetch(
-        "http://milestone.unionrolistes.fr:3000/api/user",
+        `http://${apiUrl}/api/user`,
         {
           method: "GET",
           headers: {
@@ -36,7 +37,7 @@ export const useUserStore = defineStore("users", {
 
     async addUser(jwt, name, role, password) {
       const res = await fetch(
-        "http://milestone.unionrolistes.fr:3000/api/user",
+        `http://${apiUrl}/api/user`,
         {
           method: "POST",
           headers: {
@@ -78,7 +79,7 @@ export const useUserStore = defineStore("users", {
         return;
       }
       const res = await fetch(
-        `http://milestone.unionrolistes.fr:3000/api/user/${id}`,
+        `http://${apiUrl}/api/user/${id}`,
         {
           method: "DELETE",
           headers: {
@@ -111,7 +112,7 @@ export const useUserStore = defineStore("users", {
 
     async updateUser(jwt, id, name, role, password) {
       const res = await fetch(
-        `http://milestone.unionrolistes.fr:3000/api/user/${id}`,
+        `http://${apiUrl}/api/user/${id}`,
         {
           method: "PUT",
           headers: {
