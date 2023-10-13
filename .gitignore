@@ -9,3 +9,5 @@ node_modules
 .env
 dist
 milestone.db
+.env.dev
+.env.preview
