@@ -47,8 +47,7 @@ const password = ref("");
 const error = ref("");
 const emit = defineEmits(["close"]);
 const jwtStore = useJwtStore();
-
-
+const runtimeConfig = useRuntimeConfig()
 
 defineProps({
   showForm: {
@@ -90,7 +89,6 @@ const handleChange = () => {
   error.value = "";
 };
 
-const runtimeConfig = useRuntimeConfig()
 
 
 const redirectToDiscordOAuth = () => {
