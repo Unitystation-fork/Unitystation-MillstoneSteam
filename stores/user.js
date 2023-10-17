@@ -34,7 +34,7 @@ export const useUserStore = defineStore("users", {
       return true;
     },
 
-    async addUser(jwt, name, role, password) {
+    async addUser(jwt, name, role, password, discordId, twitchId) {
       const res = await fetch(
         "http://localhost:3000/api/user",
         {
@@ -47,6 +47,8 @@ export const useUserStore = defineStore("users", {
             name,
             role,
             password,
+            discordId,
+            twitchId,
           }),
         }
       )
@@ -109,7 +111,7 @@ export const useUserStore = defineStore("users", {
       return alert("L'utilisateur a bien été supprimé.");
     },
 
-    async updateUser(jwt, id, name, role, password) {
+    async updateUser(jwt, id, name, role, password, discordId, twitchId) {
       const res = await fetch(
         `http://localhost:3000/api/user/${id}`,
         {
@@ -122,6 +124,8 @@ export const useUserStore = defineStore("users", {
             name,
             role,
             password,
+            discordId,
+            twitchId,
           }),
         }
       )
