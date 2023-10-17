@@ -25,4 +25,14 @@ export default defineNuxtConfig({
       },
     ],
   ],
+  runtimeConfig: {
+    public: {
+      discordClientId: process.env.DISCORD_CLIENT_ID,
+      discordClientSecret: process.env.DISCORD_CLIENT_SECRET,
+      discordClientRedirect: process.env.DISCORD_CLIENT_REDIRECT,
+      twitchClientId: process.env.TWITCH_CLIENT_ID,
+      twitchClientSecret: process.env.TWTICH_CLIENT_SECRET,
+      twitchClientRedirect: process.env.TWITCH_CLIENT_REDIRECT,
+    }
+  }
 });
