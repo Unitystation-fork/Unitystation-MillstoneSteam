@@ -5,42 +5,33 @@
     </transition>
     <transition name="pop">
       <form method="post" @submit.prevent="addUser">
-        <span
-          class="material-symbols-outlined close-btn"
-          @click="$emit('close')"
-          >close</span
-        >
+        <span class="material-symbols-outlined close-btn" @click="$emit('close')">
+          close
+        </span>
         <h2>Ajouter un utilisateur</h2>
         <div>
           <label for="username">Nom d'utilisateur</label>
-          <input
-            name="name"
-            class="colorText inputStyleAdd"
-            type="text"
-            v-model="name"
-          />
+          <input name="name" class="colorText inputStyleAdd" type="text" v-model="name" />
         </div>
         <div>
           <label for="password">Mot de passe</label>
-          <input
-            name="password"
-            class="colorText inputStyleAdd"
-            type="password"
-            v-model="password"
-          />
+          <input name="password" class="colorText inputStyleAdd" type="password" v-model="password" />
         </div>
         <div>
           <label for="role">Rôle</label>
-          <select
-            name="role"
-            class="colorText inputStyleAdd"
-            v-model="role"
-            id="role"
-          >
+          <select name="role" class="colorText inputStyleAdd" v-model="role" id="role">
             <option value="ADMIN">Administrateur</option>
             <option value="USER">Utilisateur</option>
             <option value="STREAMER">Streamer</option>
           </select>
+        </div>
+        <div>
+          <label for="discord">Discord (optionnel)</label>
+          <input name="discord" class="colorText inputStyleAdd" type="text" v-model="discord" />
+        </div>
+        <div>
+          <label for="twitch">Twitch (optionnel)</label>
+          <input name="twitch" class="colorText inputStyleAdd" type="text" v-model="twitch" />
         </div>
         <input class="btnSubmitStyle" type="submit" value="Ajouter" />
         <p class="error" v-if="error !== ''">{{ error }}</p>
@@ -48,6 +39,7 @@
     </transition>
   </div>
 </template>
+
 
 <script setup>
 import { useJwtStore } from "~~/stores/jwt";
@@ -114,11 +106,13 @@ const addUser = async () => {
   cursor: pointer;
   align-self: flex-end;
 }
+
 label {
   color: white;
   padding-bottom: 0;
   margin-left: 2em;
 }
+
 form {
   position: absolute;
   position: fixed;
@@ -143,6 +137,7 @@ form {
   align-items: center;
   justify-content: center;
 }
+
 .colorText {
   color: black;
   margin: 10px;
