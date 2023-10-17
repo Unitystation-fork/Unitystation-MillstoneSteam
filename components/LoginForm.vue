@@ -95,7 +95,8 @@ const redirectToDiscordOAuth = () => {
   const discordClientId = runtimeConfig.discordClientId;
   const discordRedirectUri = runtimeConfig.discordClientRedirect;
 
-  const discordOAuthUrl = `  https://discord.com/api/oauth2/authorize?client_id=${discordClientId}&redirect_uri=${discordRedirectUri}&response_type=code&scope=identify%20guilds`;
+  const discordOAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${discordClientId}&redirect_uri=${discordRedirectUri}&response_type=code&scope=identify`;
+
   console.log(discordRedirectUri);
   window.location.href = discordOAuthUrl;
 };
@@ -105,6 +106,7 @@ const redirectToTwitchOAuth = () => {
   const twitchRedirectUri = runtimeConfig.twitchClientRedirect;
 
   const twitchOAuthUrl = `https://id.twitch.tv/oauth2/authorize?client_id=${twitchClientId}&redirect_uri=${twitchRedirectUri}&response_type=code&scope=openid`;
+
 
   window.location.href = twitchOAuthUrl;
 };
