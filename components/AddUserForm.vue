@@ -50,6 +50,8 @@ const userStore = useUserStore();
 const name = ref("");
 const password = ref("");
 const role = ref("USER");
+const discordId = ref("");
+const twitchId = ref("");
 const error = ref("");
 const emit = defineEmits(["close"]);
 
@@ -78,7 +80,9 @@ const addUser = async () => {
     jwtStore.jwt,
     name.value,
     role.value,
-    password.value
+    password.value,
+    discordId.value,
+    twitchId.value
   );
   if (response) {
     await userStore.setUsers(jwtStore.jwt);
