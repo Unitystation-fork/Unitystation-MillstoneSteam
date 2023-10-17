@@ -21,6 +21,16 @@
           <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Votre mot de passe"
             v-model="password" @keyup="handleChange" />
         </div>
+        <div class="oauth-icons">
+          <a href="#" class="oauth-button discord" @click="redirectToDiscordOAuth">
+            <img src="../assets/img/discord-icon.png" alt="Discord Icon" />
+            Se connecter avec Discord
+          </a>
+          <a href="#" class="oauth-button twitch" @click="redirectToTwitchOAuth">
+            <img src="../assets/img/twitch-icon.png" alt="Twitch Icon" />
+            Se connecter avec Twitch
+          </a>
+        </div>
         <input type="submit" value="Connexion" />
         <span class="error" v-if="error !== ''">{{ error }}</span>
       </form>
@@ -31,11 +41,14 @@
 <script setup>
 import { useJwtStore } from "~~/stores/jwt";
 
+
 const username = ref("");
 const password = ref("");
 const error = ref("");
 const emit = defineEmits(["close"]);
 const jwtStore = useJwtStore();
+
+
 
 defineProps({
   showForm: {
@@ -59,19 +72,47 @@ const login = async () => {
       name: username.value,
       password: password.value,
     }),
-  }).then((r) => r.json());
-  if (res.statusCode !== 200) {
-    error.value = res.message;
-    return;
+  })
+    .then((r) => r.json())
+    .catch((e) => {
+      error.value = e.message;
+      console.log(e);
+    });
+  if (res.statusCode === 200) {
+    jwtStore.setJwt(res.body.token);
+    jwtStore.setRole(res.body.role);
+    console.log("Logged in");
+    emit("close");
   }
-  jwtStore.setJwt(res.body.token);
-  jwtStore.setRole(res.body.role);
-  emit("close");
 };
 
 const handleChange = () => {
   error.value = "";
 };
+
+const runtimeConfig = useRuntimeConfig()
+
+
+const redirectToDiscordOAuth = () => {
+  const discordClientId = runtimeConfig.discordClientId;
+  const discordRedirectUri = runtimeConfig.discordClientRedirect;
+
+  const discordOAuthUrl = `  https://discord.com/api/oauth2/authorize?client_id=${discordClientId}&redirect_uri=${discordRedirectUri}&response_type=code&scope=identify%20guilds`;
+  console.log(discordRedirectUri);
+  window.location.href = discordOAuthUrl;
+};
+
+const redirectToTwitchOAuth = () => {
+  const twitchClientId = runtimeConfig.twitchClientId;
+  const twitchRedirectUri = runtimeConfig.twitchClientRedirect;
+
+  const twitchOAuthUrl = `https://id.twitch.tv/oauth2/authorize?client_id=${twitchClientId}&redirect_uri=${twitchRedirectUri}&response_type=code&scope=openid`;
+
+  window.location.href = twitchOAuthUrl;
+};
+
+
+
 </script>
 
 <style scoped>
@@ -114,7 +155,6 @@ form {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1em;
 }
 
 label {
@@ -150,25 +190,58 @@ button {
   color: white;
 }
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.01s linear;
+.oauth-icons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
 }
 
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
+.oauth-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5em 1em;
+  background-color: #7289da;
+  /* Couleur Discord */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
-.pop-enter-active,
-.pop-leave-active {
-  transition: transform 0.2s cubic-bezier(0.17, 0.67, 0.83, 0.67),
-    opacity 0.25s linear;
+.oauth-button:hover {
+  background-color: #5865f2;
+  /* Couleur Discord au survol */
 }
 
-.pop-enter-from,
-.pop-leave-to {
-  opacity: 0;
-  transform: scale(0.2) translateY(-50%);
+.oauth-button img {
+  width: 24px;
+  height: 24px;
+  margin-right: 0.5em;
+}
+
+/* Style spécifique pour le bouton Discord */
+.discord {
+  background-color: #7289da;
+  /* Couleur Discord */
+}
+
+.discord:hover {
+  background-color: #5865f2;
+  /* Couleur Discord au survol */
+}
+
+/* Style spécifique pour le bouton Twitch */
+.twitch {
+  background-color: #6441a5;
+  /* Couleur Twitch */
+}
+
+.twitch:hover {
+  background-color: #9146ff;
+  /* Couleur Twitch au survol */
 }
 </style>
