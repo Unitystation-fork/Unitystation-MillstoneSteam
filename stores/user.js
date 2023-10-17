@@ -7,7 +7,7 @@ export const useUserStore = defineStore("users", {
   actions: {
     async setUsers(jwt) {
       const res = await fetch(
-        "http://milestone.unionrolistes.fr:3000/api/user",
+        "http://localhost:3000/api/user",
         {
           method: "GET",
           headers: {
@@ -36,7 +36,7 @@ export const useUserStore = defineStore("users", {
 
     async addUser(jwt, name, role, password) {
       const res = await fetch(
-        "http://milestone.unionrolistes.fr:3000/api/user",
+        "http://localhost:3000/api/user",
         {
           method: "POST",
           headers: {
@@ -78,7 +78,7 @@ export const useUserStore = defineStore("users", {
         return;
       }
       const res = await fetch(
-        `http://milestone.unionrolistes.fr:3000/api/user/${id}`,
+        `http://localhost:3000/api/user/${id}`,
         {
           method: "DELETE",
           headers: {
@@ -111,7 +111,7 @@ export const useUserStore = defineStore("users", {
 
     async updateUser(jwt, id, name, role, password) {
       const res = await fetch(
-        `http://milestone.unionrolistes.fr:3000/api/user/${id}`,
+        `http://localhost:3000/api/user/${id}`,
         {
           method: "PUT",
           headers: {
