@@ -1,115 +1,95 @@
 <template>
   <div>
     <transition name="fade">
-      <div class="modal-mask" v-if="showForm" />
+      <div class="modal-mask" />
     </transition>
     <transition name="pop">
-      <form v-if="showForm" @submit.prevent="login">
-        <button type="button">
-          <span class="material-symbols-outlined" @click="$emit('close')">
-            close
-          </span>
-        </button>
-        <h2>Connexion</h2>
-        <div class="form-group">
+      <form method="post" @submit.prevent="addUser">
+        <span class="material-symbols-outlined close-btn" @click="$emit('close')">
+          close
+        </span>
+        <h2>Ajouter un utilisateur</h2>
+        <div>
           <label for="username">Nom d'utilisateur</label>
-          <input type="text" class="form-control" id="username" aria-describedby="usernameHelp"
-            placeholder="Votre nom d'utilisateur" v-model="username" @keyup="handleChange" />
+          <input name="name" class="colorText inputStyleAdd" type="text" v-model="name" />
         </div>
-        <div class="form-group">
+        <div>
           <label for="password">Mot de passe</label>
-          <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Votre mot de passe"
-            v-model="password" @keyup="handleChange" />
+          <input name="password" class="colorText inputStyleAdd" type="password" v-model="password" />
         </div>
-        <div class="oauth-icons">
-          <a href="#" class="oauth-button discord" @click="redirectToDiscordOAuth">
-            <img src="../assets/img/discord-icon.png" alt="Discord Icon" />
-            Se connecter avec Discord
-          </a>
-          <a href="#" class="oauth-button twitch" @click="redirectToTwitchOAuth">
-            <img src="../assets/img/twitch-icon.png" alt="Twitch Icon" />
-            Se connecter avec Twitch
-          </a>
+        <div>
+          <label for="role">Rôle</label>
+          <select name="role" class="colorText inputStyleAdd" v-model="role" id="role">
+            <option value="ADMIN">Administrateur</option>
+            <option value="USER">Utilisateur</option>
+            <option value="STREAMER">Streamer</option>
+          </select>
         </div>
-        <input type="submit" value="Connexion" />
-        <span class="error" v-if="error !== ''">{{ error }}</span>
+        <div>
+          <label for="discord">Discord (optionnel)</label>
+          <input name="discord" class="colorText inputStyleAdd" type="text" v-model="discord" />
+        </div>
+        <div>
+          <label for="twitch">Twitch (optionnel)</label>
+          <input name="twitch" class="colorText inputStyleAdd" type="text" v-model="twitch" />
+        </div>
+        <input class="btnSubmitStyle" type="submit" value="Ajouter" />
+        <p class="error" v-if="error !== ''">{{ error }}</p>
       </form>
     </transition>
   </div>
 </template>
 
+
 <script setup>
 import { useJwtStore } from "~~/stores/jwt";
+import { useUserStore } from "~~/stores/user";
 
-const username = ref("");
+const jwtStore = useJwtStore();
+const userStore = useUserStore();
+const name = ref("");
 const password = ref("");
+const role = ref("USER");
+const discordId = ref("");
+const twitchId = ref("");
 const error = ref("");
 const emit = defineEmits(["close"]);
-const jwtStore = useJwtStore();
-const runtimeConfig = useRuntimeConfig();
 
-defineProps({
-  showForm: {
-    type: Boolean,
-    default: false,
-  },
-});
-
-const login = async () => {
-  if (username.value.length === 0 || password.value.length === 0) {
+const addUser = async () => {
+  if (name.value.length === 0 || password.value.length === 0) {
     error.value = "Veuillez remplir tous les champs";
     return;
   }
+  if (jwtStore.jwt === null) {
+    error.value = "Veuillez vous connecter";
+    return;
+  }
+  if (jwtStore.role !== "ADMIN") {
+    error.value = "Vous n'avez pas les droits pour ajouter un utilisateur";
+    return;
+  }
 
-  const res = await fetch("http://localhost:3000/api/login", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      name: username.value,
-      password: password.value,
-    }),
-  })
-    .then((r) => r.json())
-    .catch((e) => {
-      error.value = e.message;
-      console.log(e);
-    });
-  if (res.statusCode === 200) {
-    jwtStore.setJwt(res.body.token);
-    jwtStore.setRole(res.body.role);
-    console.log("Logged in");
+  for (let i = 0; i < userStore.users.length; i++) {
+    if (userStore.users[i].name === name.value) {
+      error.value = "Un utilisateur avec ce nom existe déjà";
+      return;
+    }
+  }
+
+  const response = await userStore.addUser(
+    jwtStore.jwt,
+    name.value,
+    role.value,
+    password.value,
+    discordId.value,
+    twitchId.value
+  );
+  if (response) {
+    await userStore.setUsers(jwtStore.jwt);
+    alert("L'utilisateur a bien été ajouté");
     emit("close");
+    location.hash = "#user-list";
   }
-};
-
-const handleChange = () => {
-  error.value = "";
-};
-
-const redirectToDiscordOAuth = async () => {
-  const discordClientId = runtimeConfig.discordClientId;
-  const discordRedirectUri = runtimeConfig.discordClientRedirect;
-
-  // Vérification de l'utilisateur par le twitchId ou discordId
-  const userWithDiscordIdExists = await checkUserByDiscordId(discordId);
-
-  if (userWithDiscordIdExists) {
-    // L'utilisateur est autorisé à se connecter via Discord OAuth
-    const discordOAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${discordClientId}&redirect_uri=${discordRedirectUri}&response_type=code&scope=identify`;
-    window.location.href = discordOAuthUrl;
-  } else {
-    // Aucun utilisateur avec cet ID Discord n'a été trouvé
-    error.value = "Aucun utilisateur trouvé avec cet ID Discord. Veuillez vous inscrire avant de vous connecter via Discord OAuth.";
-  }
-};
-
-const checkUserByDiscordId = async (discordId) => {
-  // Implémentez la logique pour vérifier si un utilisateur avec cet ID Discord existe
-  // Retournez true si un utilisateur avec cet ID existe, sinon false
-  // Vous devez implémenter cette fonction en fonction de votre backend
-  return true; // Remplacez par la logique réelle
 };
 </script>
 <style scoped>
