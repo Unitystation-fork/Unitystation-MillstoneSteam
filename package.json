@@ -28,6 +28,7 @@
         "nuxt-start": "^2.15.8",
         "passport": "^0.6.0",
         "passport-discord": "^0.1.4",
+        "passport-twitch-new": "^0.0.2",
         "pinia": "^2.0.23",
         "pinia-plugin-persistedstate": "^2.3.0"
     }
