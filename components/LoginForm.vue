@@ -133,15 +133,7 @@ const exchangeCodeForAccessToken = async (code) => {
         },
       });
 
-      if (userResponse.ok) {
-        const userData = await userResponse.json();
-        const discordUsername = userData.username;
-        console.log(`Nom d'utilisateur Discord de l'utilisateur : ${discordUsername}`);
-      } else {
-        console.error('Échec de la récupération des informations de l\'utilisateur Discord');
-      }
-    } else {
-      console.error('Échec de la récupération du token');
+      return tokenResponse; // Retournez la réponse
     }
   }
 };
@@ -151,16 +143,63 @@ const exchangeCodeForAccessToken = async (code) => {
 
 
 
-const handleDiscordOAuthRedirect = () => {
+const handleDiscordOAuthRedirect = async () => {
   if (process.client) {
     const params = new URLSearchParams(window.location.search);
     const code = params.get('code');
 
     if (code) {
-      exchangeCodeForAccessToken(code);
+      const discordResponse = await exchangeCodeForAccessToken(code);
+
+      if (discordResponse.ok) {
+        const discordTokenData = await discordResponse.json(); // Stockez les données de token dans une variable distincte
+
+        if (discordTokenData) {
+          const accessToken = discordTokenData.access_token;
+          const userResponse = await fetch('https://discord.com/api/users/@me', {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+            },
+          });
+
+          if (userResponse.ok) {
+            const discordUser = await userResponse.json();
+
+            if (discordUser.discordId) {
+              // Vérifiez si cet utilisateur existe dans la base de données Prisma.
+              const existingUser = await prisma.user.findUnique({
+                where: {
+                  discordId: discordUser.discordId,
+                },
+              });
+
+              if (existingUser) {
+                // L'utilisateur existe dans la base de données, vous pouvez appeler login() avec les informations de l'utilisateur.
+                username.value = existingUser.name; // Utilisez le nom de l'utilisateur enregistré
+                password.value = ''; // Vous pouvez vider le mot de passe si vous le souhaitez
+                login();
+              } else {
+                console.error("Utilisateur Discord inconnu");
+              }
+            } else {
+              console.error("ID Discord non obtenu");
+            }
+          } else {
+            console.error("Échec de la récupération des informations de l'utilisateur");
+          }
+        } else {
+          console.error("Échec de la récupération du token");
+        }
+      } else {
+        console.error("Échec de la récupération du token");
+      }
     }
   }
 };
+
+
+
 
 handleDiscordOAuthRedirect();
 
