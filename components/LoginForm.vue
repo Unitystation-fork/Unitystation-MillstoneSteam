@@ -40,6 +40,7 @@
 
 <script setup>
 import { useJwtStore } from "~~/stores/jwt";
+import { useUserStore } from "~~/stores/user"; // Update the import path as needed
 
 
 const username = ref("");
@@ -122,10 +123,11 @@ const exchangeCodeForAccessToken = async (code) => {
     });
 
     if (tokenResponse.ok) {
-      const tokenData = await tokenResponse.json();
+      const tokenData = await tokenResponse.json(); // Read the JSON response only once
+
       const accessToken = tokenData.access_token;
 
-      // Maintenant que vous avez le jeton d'accès, utilisez-le pour obtenir les informations de l'utilisateur
+      // Now that you have the access token, use it to get user information
       const userResponse = await fetch('https://discord.com/api/users/@me', {
         method: 'GET',
         headers: {
@@ -133,15 +135,14 @@ const exchangeCodeForAccessToken = async (code) => {
         },
       });
 
-      return tokenResponse; // Retournez la réponse
+      if (userResponse.ok) {
+        const discordUser = await userResponse.json();
+
+        return discordUser; // Return the user information
+      }
     }
   }
 };
-
-
-
-
-
 
 const handleDiscordOAuthRedirect = async () => {
   if (process.client) {
@@ -149,54 +150,31 @@ const handleDiscordOAuthRedirect = async () => {
     const code = params.get('code');
 
     if (code) {
-      const discordResponse = await exchangeCodeForAccessToken(code);
+      const userStore = useUserStore(); // Initialize the store
+      const discordUser = await exchangeCodeForAccessToken(code);
 
-      if (discordResponse.ok) {
-        const discordTokenData = await discordResponse.json(); // Stockez les données de token dans une variable distincte
+      if (discordUser) {
+        const discordId = discordUser.username;
 
-        if (discordTokenData) {
-          const accessToken = discordTokenData.access_token;
-          const userResponse = await fetch('https://discord.com/api/users/@me', {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${accessToken}`,
-            },
-          });
+        // Use the store method to check if the Discord user exists in the Prisma database
+        const existingUser = await userStore.checkDiscordUserExistence(discordId);
+        console.log(existingUser);
 
-          if (userResponse.ok) {
-            const discordUser = await userResponse.json();
-
-            if (discordUser.discordId) {
-              // Vérifiez si cet utilisateur existe dans la base de données Prisma.
-              const existingUser = await prisma.user.findUnique({
-                where: {
-                  discordId: discordUser.discordId,
-                },
-              });
-
-              if (existingUser) {
-                // L'utilisateur existe dans la base de données, vous pouvez appeler login() avec les informations de l'utilisateur.
-                username.value = existingUser.name; // Utilisez le nom de l'utilisateur enregistré
-                password.value = ''; // Vous pouvez vider le mot de passe si vous le souhaitez
-                login();
-              } else {
-                console.error("Utilisateur Discord inconnu");
-              }
-            } else {
-              console.error("ID Discord non obtenu");
-            }
-          } else {
-            console.error("Échec de la récupération des informations de l'utilisateur");
-          }
+        if (existingUser) {
+          // The user exists in the database, you can proceed with your logic
+          username.value = existingUser.name;
+          password.value = '';
+          login();
         } else {
-          console.error("Échec de la récupération du token");
+          console.error("Unknown Discord User");
         }
       } else {
-        console.error("Échec de la récupération du token");
+        console.error("Failed to retrieve user information");
       }
     }
   }
 };
+
 
 
 

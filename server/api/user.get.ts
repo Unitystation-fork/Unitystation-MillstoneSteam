@@ -30,11 +30,13 @@ const users = defineEventHandler(async (event) => {
     }
     // get all users from the database and return them
     const users = await prisma.user.findMany({
-       select: {
-         name: true,
-         id: true,
-         role: true,
-      } 
+      select: {
+        name: true,
+        id: true,
+        role: true,
+        discordId: true,
+        twitchId: true,
+      }
     });
     return {
       statusCode: 200,
@@ -42,12 +44,12 @@ const users = defineEventHandler(async (event) => {
     };
   } catch (e) {
     console.log(e);
-    if(e.name ==="JsonWebTokenError"){
+    if (e.name === "JsonWebTokenError") {
       return { statusCode: 401, body: { error: "Invalid token" } };
     }
-    if(e.name==="TokenExpiredError"){
+    if (e.name === "TokenExpiredError") {
       return { statusCode: 401, body: { error: "Expired token" } };
-     }
+    }
     return {
       statusCode: 500,
       body: { message: "User could not be found", error: e },
