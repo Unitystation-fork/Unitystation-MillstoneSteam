@@ -1,4 +1,6 @@
 import { defineStore, storeToRefs } from "pinia";
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
 
 export const useUserStore = defineStore("users", {
   state: () => ({
@@ -151,6 +153,25 @@ export const useUserStore = defineStore("users", {
       }
       alert("L'utilisateur a bien été modifié.");
       return true;
+    },
+    async checkDiscordUserExistence(discordId) {
+      try {
+        // Utilisez Prisma pour vérifier si un utilisateur avec le DiscordID donné existe
+        const user = await prisma.user.findFirst({
+          where: {
+            discordId: discordId,
+          },
+        });
+
+        if (user) {
+          return user; // Renvoie l'utilisateur s'il existe
+        } else {
+          return null; // Renvoie null si l'utilisateur n'existe pas
+        }
+      } catch (e) {
+        console.error("Erreur lors de la vérification de l'existence de l'utilisateur Discord :", e);
+        return null;
+      }
     },
   },
   persist: true,

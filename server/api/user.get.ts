@@ -24,6 +24,21 @@ const users = defineEventHandler(async (event) => {
     if (!user) {
       throw "User not found";
     }
+
+    const discordId = decoded.discordId;
+    const discord = await prisma.user.findUnique({
+      where: {
+        discordId: discordId,
+      },
+    });
+
+    if (discordId) {
+      // L'utilisateur a été trouvé
+      console.log(discordId);
+    } else {
+      console.log("Aucun utilisateur trouvé avec le discordId spécifié.");
+    }
+
     //check if user is admin
     if (user.role !== "ADMIN") {
       throw "You do not have the permission to get all users";
@@ -55,6 +70,8 @@ const users = defineEventHandler(async (event) => {
       body: { message: "User could not be found", error: e },
     };
   }
+
+
 });
 
 export default users;

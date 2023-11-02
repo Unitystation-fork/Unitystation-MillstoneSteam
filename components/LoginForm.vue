@@ -156,20 +156,20 @@ const handleDiscordOAuthRedirect = async () => {
       if (discordUser) {
         const discordId = discordUser.username;
 
-        // Use the store method to check if the Discord user exists in the Prisma database
+        // Utilisez la méthode de store pour vérifier si l'utilisateur Discord existe dans la base de données Prisma
         const existingUser = await userStore.checkDiscordUserExistence(discordId);
-        console.log(existingUser);
 
         if (existingUser) {
-          // The user exists in the database, you can proceed with your logic
-          username.value = existingUser.name;
-          password.value = '';
-          login();
+          // L'utilisateur existe dans la base de données, vous pouvez poursuivre avec votre logique
+          // username.value = existingUser.name;
+          // password.value = '';
+          // login();
+          console.log(existingUser);
         } else {
-          console.error("Unknown Discord User");
+          console.error("Utilisateur Discord inconnu");
         }
       } else {
-        console.error("Failed to retrieve user information");
+        console.error("Impossible de récupérer les informations de l'utilisateur");
       }
     }
   }
