@@ -26,12 +26,12 @@
           </select>
         </div>
         <div>
-          <label for="discord">Discord (optionnel)</label>
-          <input name="discord" class="colorText inputStyleAdd" type="text" v-model="discord" />
+          <label for="discordId">Discord (optionnel)</label>
+          <input name="discordId" class="colorText inputStyleAdd" type="text" v-model="discordId" />
         </div>
         <div>
-          <label for="twitch">Twitch (optionnel)</label>
-          <input name="twitch" class="colorText inputStyleAdd" type="text" v-model="twitch" />
+          <label for="twitchId">Twitch (optionnel)</label>
+          <input name="twitchId" class="colorText inputStyleAdd" type="text" v-model="twitchId" />
         </div>
         <input class="btnSubmitStyle" type="submit" value="Ajouter" />
         <p class="error" v-if="error !== ''">{{ error }}</p>
