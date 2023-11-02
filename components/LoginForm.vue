@@ -85,6 +85,7 @@ const login = async () => {
   }
 };
 
+
 const handleChange = () => {
   error.value = "";
 };
@@ -103,7 +104,7 @@ const redirectToDiscordOAuth = async () => {
 const exchangeCodeForAccessToken = async (code) => {
   if (process.client) {
     const discordClientId = runtimeConfig.discordClientId;
-    const discordClientSecret = 'votre_secret'; // Remplacez par votre client secret Discord
+    const discordClientSecret = runtimeConfig.discordClientSecret;
     const discordRedirectUri = runtimeConfig.discordClientRedirect;
 
     const tokenRequestData = new URLSearchParams();
@@ -115,24 +116,40 @@ const exchangeCodeForAccessToken = async (code) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': `Basic ${btoa(`${discordClientId}:${discordClientSecret}`)}`,
       },
-      body: tokenRequestData,
-      auth: {
-        username: discordClientId,
-        password: discordClientSecret,
-      },
+      body: tokenRequestData.toString(),
     });
 
     if (tokenResponse.ok) {
       const tokenData = await tokenResponse.json();
       const accessToken = tokenData.access_token;
-      console.log(accessToken);
 
+      // Maintenant que vous avez le jeton d'accès, utilisez-le pour obtenir les informations de l'utilisateur
+      const userResponse = await fetch('https://discord.com/api/users/@me', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+
+      if (userResponse.ok) {
+        const userData = await userResponse.json();
+        const discordUsername = userData.username;
+        console.log(`Nom d'utilisateur Discord de l'utilisateur : ${discordUsername}`);
+      } else {
+        console.error('Échec de la récupération des informations de l\'utilisateur Discord');
+      }
     } else {
       console.error('Échec de la récupération du token');
     }
   }
 };
+
+
+
+
+
 
 const handleDiscordOAuthRedirect = () => {
   if (process.client) {
