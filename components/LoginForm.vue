@@ -90,16 +90,62 @@ const handleChange = () => {
 };
 
 
-
-const redirectToDiscordOAuth = () => {
+const redirectToDiscordOAuth = async () => {
   const discordClientId = runtimeConfig.discordClientId;
   const discordRedirectUri = runtimeConfig.discordClientRedirect;
+  const discordOAuthUrl = `https://discord.com/oauth2/authorize?response_type=code&client_id=${discordClientId}&scope=identify&state=someUniqueState&redirect_uri=${discordRedirectUri}`;
 
-  const discordOAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${discordClientId}&redirect_uri=${discordRedirectUri}&response_type=code&scope=identify`;
-
-  console.log(discordRedirectUri);
-  window.location.href = discordOAuthUrl;
+  if (process.client) {
+    window.location.href = discordOAuthUrl;
+  }
 };
+
+const exchangeCodeForAccessToken = async (code) => {
+  if (process.client) {
+    const discordClientId = runtimeConfig.discordClientId;
+    const discordClientSecret = 'votre_secret'; // Remplacez par votre client secret Discord
+    const discordRedirectUri = runtimeConfig.discordClientRedirect;
+
+    const tokenRequestData = new URLSearchParams();
+    tokenRequestData.append('grant_type', 'authorization_code');
+    tokenRequestData.append('code', code);
+    tokenRequestData.append('redirect_uri', discordRedirectUri);
+
+    const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: tokenRequestData,
+      auth: {
+        username: discordClientId,
+        password: discordClientSecret,
+      },
+    });
+
+    if (tokenResponse.ok) {
+      const tokenData = await tokenResponse.json();
+      const accessToken = tokenData.access_token;
+      console.log(accessToken);
+
+    } else {
+      console.error('Échec de la récupération du token');
+    }
+  }
+};
+
+const handleDiscordOAuthRedirect = () => {
+  if (process.client) {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+
+    if (code) {
+      exchangeCodeForAccessToken(code);
+    }
+  }
+};
+
+handleDiscordOAuthRedirect();
 
 const redirectToTwitchOAuth = () => {
   const twitchClientId = runtimeConfig.twitchClientId;
@@ -107,10 +153,8 @@ const redirectToTwitchOAuth = () => {
 
   const twitchOAuthUrl = `https://id.twitch.tv/oauth2/authorize?client_id=${twitchClientId}&redirect_uri=${twitchRedirectUri}&response_type=code&scope=openid`;
 
-
   window.location.href = twitchOAuthUrl;
 };
-
 
 
 </script>
