@@ -160,10 +160,10 @@ const handleDiscordOAuthRedirect = async () => {
         const existingUser = await userStore.checkDiscordUserExistence(discordId);
 
         if (existingUser) {
-          // L'utilisateur existe dans la base de données, vous pouvez poursuivre avec votre logique
-          // username.value = existingUser.name;
-          // password.value = '';
-          // login();
+          L'utilisateur existe dans la base de données, vous pouvez poursuivre avec votre logique
+          username.value = existingUser.name;
+          password.value = '';
+          login();
           console.log(existingUser);
         } else {
           console.error("Utilisateur Discord inconnu");
@@ -174,11 +174,6 @@ const handleDiscordOAuthRedirect = async () => {
     }
   }
 };
-
-
-
-
-
 handleDiscordOAuthRedirect();
 
 const redirectToTwitchOAuth = () => {
