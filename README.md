@@ -2,6 +2,14 @@
 
 ![forthebadge](https://forthebadge.com/images/badges/cc-nc-sa.svg)
 
+## Sommaire
+
+- [Présentation](#présentation)
+- [Langages utilisés](#langages-utilisés)
+- [Installation](#installation)
+- [Utilisation](#utilisation)
+- [Contribution](#contribution)
+
 ## Présentation
 
 Le projet MillstoneSteam a pour objectif d'offrir un suivi continu des avancées de projets menés par l'Union des Rôlistes autour du jeu UnityStation, et par la suite d'autres projets.
