@@ -11,11 +11,12 @@ export default defineNuxtConfig({
       ],
     },
   },
+  serverMiddleware: ["~/api/discord-id"],
   modules: [
     [
       "@pinia/nuxt",
-      '@nuxtjs/axios',
-      '@nuxtjs/auth-next',
+      "@nuxtjs/axios",
+      "@nuxtjs/auth-next",
       {
         autoImports: [
           // automatically imports `defineStore`
@@ -30,13 +31,13 @@ export default defineNuxtConfig({
   auth: {
     strategies: {
       discord: {
-        scheme: 'oauth2',
+        scheme: "oauth2",
         endpoints: {
-          authorization: 'https://discord.com/api/oauth2/authorize',
-          token: 'https://discord.com/api/oauth2/token',
-          userInfo: 'https://discord.com/api/users/@me',
+          authorization: "https://discord.com/api/oauth2/authorize",
+          token: "https://discord.com/api/oauth2/token",
+          userInfo: "https://discord.com/api/users/@me",
         },
-        responseType: 'token',
+        responseType: "token",
         redirectUri: process.env.DISCORD_CLIENT_REDIRECT, // Utilisez la valeur appropriée
         clientId: process.env.DISCORD_CLIENT_ID, // Utilisez la valeur appropriée
       },
@@ -50,6 +51,6 @@ export default defineNuxtConfig({
       twitchClientId: process.env.TWITCH_CLIENT_ID,
       twitchClientSecret: process.env.TWTICH_CLIENT_SECRET,
       twitchClientRedirect: process.env.TWITCH_CLIENT_REDIRECT,
-    }
-  }
+    },
+  },
 });

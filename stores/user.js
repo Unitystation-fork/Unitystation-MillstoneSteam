@@ -1,3 +1,4 @@
+// import { registerRuntimeCompiler } from "nuxt/dist/app/compat/capi";
 import { defineStore, storeToRefs } from "pinia";
 
 export const useUserStore = defineStore("users", {
@@ -6,16 +7,13 @@ export const useUserStore = defineStore("users", {
   }),
   actions: {
     async setUsers(jwt) {
-      const res = await fetch(
-        "http://localhost:3000/api/user",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${jwt}`,
-          },
-        }
-      )
+      const res = await fetch("http://localhost:3000/api/user", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwt}`,
+        },
+      })
         .then((r) => r.json())
         .catch((e) => {
           console.log("error", e);
@@ -35,23 +33,20 @@ export const useUserStore = defineStore("users", {
     },
 
     async addUser(jwt, name, role, password, discordId, twitchId) {
-      const res = await fetch(
-        "http://localhost:3000/api/user",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${jwt}`,
-          },
-          body: JSON.stringify({
-            name,
-            role,
-            password,
-            discordId,
-            twitchId,
-          }),
-        }
-      )
+      const res = await fetch("http://localhost:3000/api/user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwt}`,
+        },
+        body: JSON.stringify({
+          name,
+          role,
+          password,
+          discordId,
+          twitchId,
+        }),
+      })
         .then((r) => r.json())
         .catch((e) => {
           console.log("error", e);
@@ -79,16 +74,13 @@ export const useUserStore = defineStore("users", {
       if (!conf) {
         return;
       }
-      const res = await fetch(
-        `http://localhost:3000/api/user/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${jwt}`,
-          },
-        }
-      )
+      const res = await fetch(`http://localhost:3000/api/user/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwt}`,
+        },
+      })
         .then((r) => r.json())
         .catch((e) => {
           console.log("error", e);
@@ -112,23 +104,20 @@ export const useUserStore = defineStore("users", {
     },
 
     async updateUser(jwt, id, name, role, password, discordId, twitchId) {
-      const res = await fetch(
-        `http://localhost:3000/api/user/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${jwt}`,
-          },
-          body: JSON.stringify({
-            name,
-            role,
-            password,
-            discordId,
-            twitchId,
-          }),
-        }
-      )
+      const res = await fetch(`http://localhost:3000/api/user/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwt}`,
+        },
+        body: JSON.stringify({
+          name,
+          role,
+          password,
+          discordId,
+          twitchId,
+        }),
+      })
         .then((r) => r.json())
         .catch((e) => {
           console.log("error", e);
@@ -151,6 +140,19 @@ export const useUserStore = defineStore("users", {
       }
       alert("L'utilisateur a bien été modifié.");
       return true;
+    },
+    async checkDiscordUserExistence(userId) {
+      try {
+        const res = await fetch(
+          `http://localhost:3000/api/discord-id/${userId}`
+        );
+
+        const data = await res.json();
+        return data; // 200, 400, 500, etc.
+      } catch (e) {
+        console.log("Api discord-id error", e.message);
+        return false;
+      }
     },
   },
   persist: true,

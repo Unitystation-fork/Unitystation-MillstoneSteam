@@ -5,33 +5,42 @@
     </transition>
     <transition name="pop">
       <form method="post" @submit.prevent="addUser">
-        <span class="material-symbols-outlined close-btn" @click="$emit('close')">
-          close
-        </span>
+        <span
+          class="material-symbols-outlined close-btn"
+          @click="$emit('close')"
+          >close</span
+        >
         <h2>Ajouter un utilisateur</h2>
         <div>
           <label for="username">Nom d'utilisateur</label>
-          <input name="name" class="colorText inputStyleAdd" type="text" v-model="name" />
+          <input
+            name="name"
+            class="colorText inputStyleAdd"
+            type="text"
+            v-model="name"
+          />
         </div>
         <div>
           <label for="password">Mot de passe</label>
-          <input name="password" class="colorText inputStyleAdd" type="password" v-model="password" />
+          <input
+            name="password"
+            class="colorText inputStyleAdd"
+            type="password"
+            v-model="password"
+          />
         </div>
         <div>
           <label for="role">Rôle</label>
-          <select name="role" class="colorText inputStyleAdd" v-model="role" id="role">
+          <select
+            name="role"
+            class="colorText inputStyleAdd"
+            v-model="role"
+            id="role"
+          >
             <option value="ADMIN">Administrateur</option>
             <option value="USER">Utilisateur</option>
             <option value="STREAMER">Streamer</option>
           </select>
-        </div>
-        <div>
-          <label for="discordId">Discord (optionnel)</label>
-          <input name="discordId" class="colorText inputStyleAdd" type="text" v-model="discordId" />
-        </div>
-        <div>
-          <label for="twitchId">Twitch (optionnel)</label>
-          <input name="twitchId" class="colorText inputStyleAdd" type="text" v-model="twitchId" />
         </div>
         <input class="btnSubmitStyle" type="submit" value="Ajouter" />
         <p class="error" v-if="error !== ''">{{ error }}</p>
@@ -39,7 +48,6 @@
     </transition>
   </div>
 </template>
-
 
 <script setup>
 import { useJwtStore } from "~~/stores/jwt";
@@ -50,8 +58,6 @@ const userStore = useUserStore();
 const name = ref("");
 const password = ref("");
 const role = ref("USER");
-const discordId = ref("");
-const twitchId = ref("");
 const error = ref("");
 const emit = defineEmits(["close"]);
 
@@ -80,9 +86,7 @@ const addUser = async () => {
     jwtStore.jwt,
     name.value,
     role.value,
-    password.value,
-    discordId.value,
-    twitchId.value
+    password.value
   );
   if (response) {
     await userStore.setUsers(jwtStore.jwt);
@@ -110,13 +114,11 @@ const addUser = async () => {
   cursor: pointer;
   align-self: flex-end;
 }
-
 label {
   color: white;
   padding-bottom: 0;
   margin-left: 2em;
 }
-
 form {
   position: absolute;
   position: fixed;
@@ -141,7 +143,6 @@ form {
   align-items: center;
   justify-content: center;
 }
-
 .colorText {
   color: black;
   margin: 10px;

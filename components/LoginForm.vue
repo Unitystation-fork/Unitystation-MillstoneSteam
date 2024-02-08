@@ -13,20 +13,41 @@
         <h2>Connexion</h2>
         <div class="form-group">
           <label for="password">Nom d'utilisateur</label>
-          <input type="text" class="form-control" id="username" aria-describedby="usernameHelp"
-            placeholder="Votre nom d'utilisateur" v-model="username" @keyup="handleChange" />
+          <input
+            type="text"
+            class="form-control"
+            id="username"
+            aria-describedby="usernameHelp"
+            placeholder="Votre nom d'utilisateur"
+            v-model="username"
+            @keyup="handleChange"
+          />
         </div>
         <div class="form-group">
           <label for="password">Mot de passe</label>
-          <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Votre mot de passe"
-            v-model="password" @keyup="handleChange" />
+          <input
+            type="password"
+            class="form-control"
+            id="exampleInputPassword1"
+            placeholder="Votre mot de passe"
+            v-model="password"
+            @keyup="handleChange"
+          />
         </div>
         <div class="oauth-icons">
-          <a href="#" class="oauth-button discord" @click="redirectToDiscordOAuth">
+          <a
+            href="#"
+            class="oauth-button discord"
+            @click="redirectToDiscordOAuth"
+          >
             <img src="../assets/img/discord-icon.png" alt="Discord Icon" />
             Se connecter avec Discord
           </a>
-          <a href="#" class="oauth-button twitch" @click="redirectToTwitchOAuth">
+          <a
+            href="#"
+            class="oauth-button twitch"
+            @click="redirectToTwitchOAuth"
+          >
             <img src="../assets/img/twitch-icon.png" alt="Twitch Icon" />
             Se connecter avec Twitch
           </a>
@@ -41,14 +62,14 @@
 <script setup>
 import { useJwtStore } from "~~/stores/jwt";
 import { useUserStore } from "~~/stores/user"; // Update the import path as needed
-
+import { useDiscordStore } from "~~/stores/discord";
 
 const username = ref("");
 const password = ref("");
 const error = ref("");
 const emit = defineEmits(["close"]);
 const jwtStore = useJwtStore();
-const runtimeConfig = useRuntimeConfig()
+const runtimeConfig = useRuntimeConfig();
 
 defineProps({
   showForm: {
@@ -57,21 +78,31 @@ defineProps({
   },
 });
 
-const login = async () => {
-  if (username.value.length === 0 || password.value.length === 0) {
-    error.value = "Veuillez remplir tous les champs";
-    return;
+// login handles two types of connections: administrator login requires a username and a password,
+// users via discord oAuth are ordinary users and do not require a password
+const login = async (isAdmin = true) => {
+  //If it is an admin login, the username and password are required.
+  //If it is a third-party oauth login, the password is not required and the username is filled in by the program.
+  if (isAdmin) {
+    if (username.value.length === 0 || password.value.length === 0) {
+      error.value = "Veuillez remplir tous les champs";
+      return;
+    }
   }
-
+  const data = isAdmin
+    ? {
+        name: username.value,
+        password: password.value,
+      }
+    : {
+        name: username.value,
+      };
   const res = await fetch("http://localhost:3000/api/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      name: username.value,
-      password: password.value,
-    }),
+    body: JSON.stringify(data),
   })
     .then((r) => r.json())
     .catch((e) => {
@@ -81,16 +112,15 @@ const login = async () => {
   if (res.statusCode === 200) {
     jwtStore.setJwt(res.body.token);
     jwtStore.setRole(res.body.role);
-    console.log("Logged in");
+    //redirect to home page from discord cord address
+    await navigateTo("/");
     emit("close");
   }
 };
 
-
 const handleChange = () => {
   error.value = "";
 };
-
 
 const redirectToDiscordOAuth = async () => {
   const discordClientId = runtimeConfig.discordClientId;
@@ -109,15 +139,17 @@ const exchangeCodeForAccessToken = async (code) => {
     const discordRedirectUri = runtimeConfig.discordClientRedirect;
 
     const tokenRequestData = new URLSearchParams();
-    tokenRequestData.append('grant_type', 'authorization_code');
-    tokenRequestData.append('code', code);
-    tokenRequestData.append('redirect_uri', discordRedirectUri);
+    tokenRequestData.append("grant_type", "authorization_code");
+    tokenRequestData.append("code", code);
+    tokenRequestData.append("redirect_uri", discordRedirectUri);
 
-    const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
-      method: 'POST',
+    const tokenResponse = await fetch("https://discord.com/api/oauth2/token", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Basic ${btoa(`${discordClientId}:${discordClientSecret}`)}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: `Basic ${btoa(
+          `${discordClientId}:${discordClientSecret}`
+        )}`,
       },
       body: tokenRequestData.toString(),
     });
@@ -128,10 +160,10 @@ const exchangeCodeForAccessToken = async (code) => {
       const accessToken = tokenData.access_token;
 
       // Now that you have the access token, use it to get user information
-      const userResponse = await fetch('https://discord.com/api/users/@me', {
-        method: 'GET',
+      const userResponse = await fetch("https://discord.com/api/users/@me", {
+        method: "GET",
         headers: {
-          'Authorization': `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 
@@ -147,29 +179,40 @@ const exchangeCodeForAccessToken = async (code) => {
 const handleDiscordOAuthRedirect = async () => {
   if (process.client) {
     const params = new URLSearchParams(window.location.search);
-    const code = params.get('code');
+    const code = params.get("code");
 
     if (code) {
-      const userStore = useUserStore(); // Initialize the store
-      const discordUser = await exchangeCodeForAccessToken(code);
+      try {
+        const userStore = useUserStore(); // Initialize the store
+        const discordUser = await exchangeCodeForAccessToken(code);
 
-      if (discordUser) {
-        const discordId = discordUser.username;
+        if (discordUser) {
+          const discordId = discordUser.username;
 
-        // Utilisez la méthode de store pour vérifier si l'utilisateur Discord existe dans la base de données Prisma
-        const existingUser = await userStore.checkDiscordUserExistence(discordId);
+          // Utilisez la méthode de store pour vérifier si l'utilisateur Discord existe dans la base de données Prisma
+          const res = await userStore.checkDiscordUserExistence(discordId);
 
-        if (existingUser) {
-          L'utilisateur existe dans la base de données, vous pouvez poursuivre avec votre logique
-          username.value = existingUser.name;
-          password.value = '';
-          login();
-          console.log(existingUser);
+          if (res.statusCode == 200) {
+            console.log("Utilisateur Discord trouvé");
+            //L'utilisateur existe dans la base de données, vous pouvez poursuivre avec votre logique
+            username.value = discordId;
+            password.value = "";
+            // Discord user login, no need of password
+            login(false);
+          } else if (res.statusCode == 400) {
+            console.error("Utilisateur Discord inconnu");
+            alert(
+              "Utilisateur Discord inconnu, Veuillez envoyer un e-mail à l'administrateur pour vous ajouter à la liste invitation."
+            );
+            await navigateTo("/");
+          }
         } else {
-          console.error("Utilisateur Discord inconnu");
+          console.error(
+            "Impossible de récupérer les informations de l'utilisateur"
+          );
         }
-      } else {
-        console.error("Impossible de récupérer les informations de l'utilisateur");
+      } catch (e) {
+        console.error("Discord OAuth Redirect error");
       }
     }
   }
@@ -184,8 +227,6 @@ const redirectToTwitchOAuth = () => {
 
   window.location.href = twitchOAuthUrl;
 };
-
-
 </script>
 
 <style scoped>
