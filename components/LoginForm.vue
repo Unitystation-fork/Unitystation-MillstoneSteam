@@ -63,7 +63,9 @@
 import { useJwtStore } from "~~/stores/jwt";
 import { useUserStore } from "~~/stores/user"; // Update the import path as needed
 import { useDiscordStore } from "~~/stores/discord";
+import { onMounted } from "vue";
 
+const userStore = useUserStore();
 const username = ref("");
 const password = ref("");
 const error = ref("");
@@ -78,14 +80,45 @@ defineProps({
   },
 });
 
+// This function is called when the component is mounted
+onMounted(async () => {
+  // Create a new URLSearchParams object with the query string of the current URL
+  const urlParams = new URLSearchParams(window.location.search);
+
+  // Get the value of the "code" parameter from the URL
+  const code = urlParams.get("code");
+
+  // Get the value of the "service" parameter from the URL
+  const service = urlParams.get("service");
+
+  // If a code is present in the URL parameters
+  if (code) {
+    // If the service is "discord"
+    if (service === "discord") {
+      // Handle the OAuth redirect for Discord with the provided code
+      await handleDiscordOAuthRedirect(code);
+    }
+    // If the service is "twitch"
+    else if (service === "twitch") {
+      // Handle the OAuth redirect for Twitch with the provided code
+      await handleTwitchOAuthRedirect(code);
+    }
+  }
+});
+
 // login handles two types of connections: administrator login requires a username and a password,
 // users via discord oAuth are ordinary users and do not require a password
 const login = async (isAdmin = true) => {
   //If it is an admin login, the username and password are required.
-  //If it is a third-party oauth login, the password is not required and the username is filled in by the program.
+  //If it is a third-party oauth login, the password is not required.
   if (isAdmin) {
     if (username.value.length === 0 || password.value.length === 0) {
       error.value = "Veuillez remplir tous les champs";
+      return;
+    }
+  } else {
+    if (username.value.length === 0) {
+      error.value = "Veuillez remplir le nom";
       return;
     }
   }
@@ -112,7 +145,8 @@ const login = async (isAdmin = true) => {
   if (res.statusCode === 200) {
     jwtStore.setJwt(res.body.token);
     jwtStore.setRole(res.body.role);
-    //redirect to home page from discord cord address
+    //redirect to home page from discord callback address
+    alert("Votre connexion est réussie");
     await navigateTo("/");
     emit("close");
   }
@@ -176,56 +210,151 @@ const exchangeCodeForAccessToken = async (code) => {
   }
 };
 
-const handleDiscordOAuthRedirect = async () => {
+// This function handles the OAuth redirect for Discord
+const handleDiscordOAuthRedirect = async (code) => {
+  // Check if the process is client-side
   if (process.client) {
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get("code");
+    try {
+      // Exchange the code for an access token and get the Discord user
+      const discordUser = await exchangeCodeForAccessToken(code);
 
-    if (code) {
-      try {
-        const userStore = useUserStore(); // Initialize the store
-        const discordUser = await exchangeCodeForAccessToken(code);
+      // If the Discord user exists
+      if (discordUser) {
+        // Get the username of the Discord user
+        const discordId = discordUser.username;
 
-        if (discordUser) {
-          const discordId = discordUser.username;
+        // Check if the Discord user exists in the user store
+        const res = await userStore.checkThirdPartyUserExistence(discordId);
 
-          // Utilisez la méthode de store pour vérifier si l'utilisateur Discord existe dans la base de données Prisma
-          const res = await userStore.checkDiscordUserExistence(discordId);
+        // If the user exists (status code 200)
+        if (res.statusCode == 200) {
+          console.log("Utilisateur Discord trouvé");
 
-          if (res.statusCode == 200) {
-            console.log("Utilisateur Discord trouvé");
-            //L'utilisateur existe dans la base de données, vous pouvez poursuivre avec votre logique
-            username.value = discordId;
-            password.value = "";
-            // Discord user login, no need of password
-            login(false);
-          } else if (res.statusCode == 400) {
-            console.error("Utilisateur Discord inconnu");
-            alert(
-              "Utilisateur Discord inconnu, Veuillez envoyer un e-mail à l'administrateur pour vous ajouter à la liste invitation."
-            );
-            await navigateTo("/");
-          }
-        } else {
-          console.error(
-            "Impossible de récupérer les informations de l'utilisateur"
-          );
+          // Set the username value to the Discord ID
+          username.value = discordId;
+
+          // Clear the password value
+          password.value = "";
+
+          // Log in the user, Discord user does not need a password
+          login(false);
         }
-      } catch (e) {
-        console.error("Discord OAuth Redirect error");
+        // If the user does not exist (status code 400)
+        else if (res.statusCode == 400) {
+          console.error("Utilisateur Discord inconnu");
+
+          // Alert the user that they are unknown and need to email the admin
+          alert(
+            "Utilisateur Discord inconnu, veuillez envoyer un e-mail à <contact.unionrolistes@gmail.com> pour vous ajouter à la liste invitation."
+          );
+
+          // Navigate to the home page
+          await navigateTo("/");
+        }
+      } else {
+        console.error(
+          "Impossible de récupérer les informations de l'utilisateur"
+        );
       }
+    } catch (e) {
+      console.error("Discord OAuth Redirect error");
     }
   }
 };
-handleDiscordOAuthRedirect();
 
+// Twitch Connect Button function: Twitch oAuth Redirect
 const redirectToTwitchOAuth = () => {
   const twitchClientId = runtimeConfig.twitchClientId;
   const twitchRedirectUri = runtimeConfig.twitchClientRedirect;
-
   const twitchOAuthUrl = `https://id.twitch.tv/oauth2/authorize?client_id=${twitchClientId}&redirect_uri=${twitchRedirectUri}&response_type=code&scope=openid`;
 
-  window.location.href = twitchOAuthUrl;
+  if (process.client) {
+    window.location.href = twitchOAuthUrl;
+  }
+};
+// handleTwitchOAuthRedirect: get user's information and login
+const handleTwitchOAuthRedirect = async (code) => {
+  // Check if the process is client-side
+  if (process.client) {
+    // Get the Twitch client ID, client secret, and redirect URI from the runtime config
+    const clientId = runtimeConfig.twitchClientId;
+    const clientSecret = runtimeConfig.twitchClientSecret;
+    const redirectUri = runtimeConfig.twitchClientRedirect;
+
+    try {
+      // Make a POST request to the Twitch OAuth2 token endpoint to exchange the code for an access token
+      const response = await fetch("https://id.twitch.tv/oauth2/token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          client_id: clientId,
+          client_secret: clientSecret,
+          code: code,
+          grant_type: "authorization_code",
+          redirect_uri: redirectUri,
+        }),
+      });
+
+      // Parse the response as JSON
+      const data = await response.json();
+
+      // Get the access token from the response data
+      const accessToken = data.access_token;
+
+      // Make a GET request to the Twitch users endpoint to get the user info associated with the access token
+      const userInfoResponse = await fetch(
+        "https://api.twitch.tv/helix/users",
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Client-Id": clientId,
+          },
+        }
+      );
+
+      // Parse the user info response as JSON
+      const userInfo = await userInfoResponse.json();
+
+      // Get the user ID from the user info data
+      const userId = userInfo.data[0].login;
+
+      // If the user ID exists
+      if (userId) {
+        // Check if the user exists in the user store
+        const res = await userStore.checkThirdPartyUserExistence(userId);
+
+        // If the user exists (status code 200)
+        if (res.statusCode == 200) {
+          console.log("Twitch Utilisateur trouvé");
+
+          // Set the username value to the user ID and clear the password value
+          username.value = userId;
+          password.value = "";
+
+          // Log in the user
+          login(false);
+        }
+        // If the user does not exist (status code 400)
+        else if (res.statusCode == 400) {
+          console.error("Twitch Utilisateur inconnu");
+
+          // Alert the user that they are unknown and need to email the admin
+          alert(
+            "Utilisateur Twitch inconnu, veuillez envoyer un e-mail à <contact.unionrolistes@gmail.com> pour vous ajouter à la liste invitation."
+          );
+
+          // Navigate to the home page
+          await navigateTo("/");
+        }
+      } else {
+        console.error("Unable to retrieve user information");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
 };
 </script>
 

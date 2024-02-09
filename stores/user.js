@@ -141,10 +141,10 @@ export const useUserStore = defineStore("users", {
       alert("L'utilisateur a bien été modifié.");
       return true;
     },
-    async checkDiscordUserExistence(userId) {
+    async checkThirdPartyUserExistence(userId) {
       try {
         const res = await fetch(
-          `http://localhost:3000/api/discord-id/${userId}`
+          `http://localhost:3000/api/third-party/${userId}`
         );
 
         const data = await res.json();

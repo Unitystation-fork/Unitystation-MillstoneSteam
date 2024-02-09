@@ -11,12 +11,12 @@ export default defineEventHandler(async (event) => {
 
     if (discordUser) {
       return {
-        // Discord user found
+        // Discord/Twitch user found
         statusCode: 200,
       };
     } else {
       return {
-        // Discord user not found
+        // Discord/Twitch user not found
         statusCode: 400,
       };
     }
