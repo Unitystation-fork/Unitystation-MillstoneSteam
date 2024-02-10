@@ -163,6 +163,7 @@ Pouvoir consulter, de manière simple, les points dans la progression :
 **Options pour les Autres Utilisateurs :**
 
 - Lecture sur la barre de progression et les différentes tâches (ne peuvent rien modifier)
+- Les utilisateurs peuvent se connecter en utilisant Discord ou Twitch.  
 
 
 
