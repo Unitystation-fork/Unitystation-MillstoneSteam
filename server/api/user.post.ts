@@ -6,7 +6,6 @@
  * JWT pour l'authentification.
  */
 
-
 import { PrismaClient } from "@prisma/client";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import bcrypt from "bcrypt";
@@ -20,20 +19,23 @@ const createUser = defineEventHandler(async (event) => {
   const discordId = body.discordId;
   const twitchId = body.twitchId;
   const auth = event.req.headers.authorization;
-  const token = (auth !== undefined) ? auth.split(" ")[1] : null;
+  const token = auth !== undefined ? auth.split(" ")[1] : null;
   try {
     // vérifiez la validité du jeton
     if (!token) {
       throw "No token provided";
     }
-    const decoded: string | JwtPayload = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded: string | JwtPayload = jwt.verify(
+      token,
+      process.env.JWT_SECRET
+    );
     if (!decoded || typeof decoded === "string") {
       throw "Invalid token";
     }
     const user = await prisma.user.findUnique({
       where: {
         id: decoded.id,
-      }
+      },
     });
     if (!user) {
       throw "User not found";
@@ -47,7 +49,7 @@ const createUser = defineEventHandler(async (event) => {
     const userToCreate = await prisma.user.findUnique({
       where: {
         name: name,
-      }
+      },
     });
     if (userToCreate) {
       throw "User already exists";
@@ -59,7 +61,7 @@ const createUser = defineEventHandler(async (event) => {
         role: role,
         discordId: discordId,
         twitchId: twitchId,
-      }
+      },
     });
     return {
       statusCode: 200,

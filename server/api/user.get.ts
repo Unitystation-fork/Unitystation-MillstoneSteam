@@ -24,17 +24,34 @@ const users = defineEventHandler(async (event) => {
     if (!user) {
       throw "User not found";
     }
+
+    const discordId = decoded.discordId;
+    const discord = await prisma.user.findUnique({
+      where: {
+        discordId: discordId,
+      },
+    });
+
+    if (discordId) {
+      // L'utilisateur a été trouvé
+      console.log(discordId);
+    } else {
+      console.log("Aucun utilisateur trouvé avec le discordId spécifié.");
+    }
+
     //check if user is admin
     if (user.role !== "ADMIN") {
       throw "You do not have the permission to get all users";
     }
     // get all users from the database and return them
     const users = await prisma.user.findMany({
-       select: {
-         name: true,
-         id: true,
-         role: true,
-      } 
+      select: {
+        name: true,
+        id: true,
+        role: true,
+        discordId: true,
+        twitchId: true,
+      }
     });
     return {
       statusCode: 200,
@@ -42,17 +59,19 @@ const users = defineEventHandler(async (event) => {
     };
   } catch (e) {
     console.log(e);
-    if(e.name ==="JsonWebTokenError"){
+    if (e.name === "JsonWebTokenError") {
       return { statusCode: 401, body: { error: "Invalid token" } };
     }
-    if(e.name==="TokenExpiredError"){
+    if (e.name === "TokenExpiredError") {
       return { statusCode: 401, body: { error: "Expired token" } };
-     }
+    }
     return {
       statusCode: 500,
       body: { message: "User could not be found", error: e },
     };
   }
+
+
 });
 
 export default users;
