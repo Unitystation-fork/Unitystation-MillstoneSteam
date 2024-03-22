@@ -36,6 +36,13 @@ npm install
 # Utilisation de pnpm
 pnpm install --shamefully-hoist
 ```
+## Activation de Prisma
+
+Pour activer Prisma il faut utiliser la commande :
+
+```bash
+npx prisma generate
+```
 
 ## Démarrage du serveur de développement
 
