@@ -18,6 +18,12 @@
     </p>
 
     <div class="btns">
+      <a href="https://vu.fr/mGJw">
+        <button>Create account</button>
+      </a>
+    </div>
+
+    <div class="btns">
       <button v-if="!jwtStore.jwt" @click="$emit('login')">Login</button>
       <button v-if="jwtStore.jwt" @click="jwtStore.logout()">Logout</button>
     </div>
