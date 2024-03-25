@@ -17,9 +17,9 @@
       {{ canadianDate }}
     </p>
 
-    <div class="btns">
-      <a href="https://vu.fr/mGJw">
-        <button>Create account</button>
+    <div class="btns" v-if="showCreateButton && !jwtStore.jwt">
+      <a href="https://vu.fr/mGJw" target="_blank">
+        <button @click="hideCreateButton">Create account</button>
       </a>
     </div>
 
@@ -31,6 +31,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue';
 import { useJwtStore } from "~/stores/jwt";
 
 let now = new Date();
@@ -49,6 +50,14 @@ let canadianDate = now.toLocaleString("fr-FR", {
 });
 
 const jwtStore = useJwtStore();
+
+const showCreateButton = ref(localStorage.getItem('showCreateButton') === 'true');
+
+const hideCreateButton = () => {
+  showCreateButton.value = false;
+  localStorage.setItem('showCreateButton', 'false');
+}
+
 </script>
 
 <style scoped>
