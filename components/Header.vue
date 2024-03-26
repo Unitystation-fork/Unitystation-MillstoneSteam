@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import { useJwtStore } from "~/stores/jwt";
 
 let now = new Date();
