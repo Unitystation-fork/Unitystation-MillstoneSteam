@@ -23,12 +23,12 @@
         </div>
         <div>
           <label for="content">Description</label>
-          <input
+          <textarea
             name="content"
             class="colorText inputStyleAdd"
             type="text"
-            v-model="content"
-          />
+            v-model="content">
+          </textarea>
         </div>
         <div class="content-private">
           <input

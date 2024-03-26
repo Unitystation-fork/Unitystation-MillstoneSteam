@@ -8,12 +8,12 @@
       </div>
       <div class="input">
         <label class="label" for="content">Descritpion</label>
-        <input
+        <textarea
           name="content"
           class="inputStyle"
           type="text"
-          v-model="contentInput"
-        />
+          v-model="contentInput">
+        </textarea>
       </div>
       <div class="checkboxInput">
         <input type="checkbox" v-model="completedInput" class="check" />
