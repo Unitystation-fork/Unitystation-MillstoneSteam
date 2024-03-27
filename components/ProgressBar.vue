@@ -18,7 +18,6 @@
 <script setup>
 import { useTaskStore } from "~~/stores/task";
 const taskStore = useTaskStore();
-const taskId = taskStore.id;
 const finishedTasks = computed(() =>
   taskStore.tasks.filter((task) => task.completed)
 );
