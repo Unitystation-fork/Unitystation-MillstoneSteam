@@ -2,13 +2,13 @@
   <div class="container">
     <span>Progression : {{ progressionRatio }} % </span>
     <div class="progress-bar">
-      <div class="second-container">
+      <div class="second-container" :style="{'width' : (progressionRatio * 0.75) + 'vw'}">
         <li class="finished-task" v-for="t in finishedTasks"></li>
       </div>
       <li class="img">
         <img src="~/assets/img/cursor.gif" alt="progress-bar-cursor" />
       </li>
-      <div class="third-container">
+      <div class="third-container" :style="{'width' : ((100 - progressionRatio) * 0.75) + 'vw'}">
         <li class="unfinished-task" v-for="t in unfinishedTasks"></li>
       </div>
     </div>
@@ -18,6 +18,7 @@
 <script setup>
 import { useTaskStore } from "~~/stores/task";
 const taskStore = useTaskStore();
+const taskId = taskStore.id;
 const finishedTasks = computed(() =>
   taskStore.tasks.filter((task) => task.completed)
 );
@@ -56,6 +57,7 @@ li {
   background: linear-gradient(to right, #6665d2, rgb(150, 81, 150));
   border-top-left-radius: 16px;
   border-bottom-left-radius: 16px;
+  height: 32px;
 }
 
 .third-container {
@@ -78,19 +80,17 @@ li {
   margin-top: 64px;
   max-width: 90vw;
 }
-
 .finished-task {
   background-color: transparent;
-  width: 4vw;
+  width: 100%;
   height: 32px;
 }
 
 .unfinished-task {
   background-color: transparent;
-  width: 4vw;
+  width: 100%;
   height: 32px;
 }
-
 .img {
   width: 0;
   overflow: visible;
