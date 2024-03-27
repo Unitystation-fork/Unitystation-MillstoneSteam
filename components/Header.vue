@@ -17,14 +17,21 @@
       {{ canadianDate }}
     </p>
 
+    <div class="btns" v-if="showCreateButton && !jwtStore.jwt">
+      <a href="https://vu.fr/mGJw" target="_blank">
+        <button @click="hideCreateButton">Create account</button>
+      </a>
+    </div>
+
     <div class="btns">
-      <button v-if="!jwtStore.jwt" @click="$emit('login')">Login</button>
-      <button v-if="jwtStore.jwt" @click="jwtStore.logout()">Logout</button>
+      <button v-if="!jwtStore.jwt" @click="$emit('login'), hideCreateButton">Login</button>
+      <button v-if="jwtStore.jwt" @click="jwtStore.logout(), showCreateButton">Logout</button>
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import { useJwtStore } from "~/stores/jwt";
 
 let now = new Date();
@@ -43,6 +50,15 @@ let canadianDate = now.toLocaleString("fr-FR", {
 });
 
 const jwtStore = useJwtStore();
+
+// Définir une variable réactive pour contrôler la visibilité du bouton "Create account"
+const showCreateButton = ref(true);
+
+// Fonction pour masquer le bouton "Create account"
+const hideCreateButton = () => {
+  showCreateButton.value = false;
+}
+
 </script>
 
 <style scoped>
