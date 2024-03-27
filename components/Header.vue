@@ -24,8 +24,8 @@
     </div>
 
     <div class="btns">
-      <button v-if="!jwtStore.jwt" @click="$emit('login')">Login</button>
-      <button v-if="jwtStore.jwt" @click="jwtStore.logout()">Logout</button>
+      <button v-if="!jwtStore.jwt" @click="$emit('login'), hideCreateButton">Login</button>
+      <button v-if="jwtStore.jwt" @click="jwtStore.logout(), showCreateButton">Logout</button>
     </div>
   </header>
 </template>
@@ -51,11 +51,12 @@ let canadianDate = now.toLocaleString("fr-FR", {
 
 const jwtStore = useJwtStore();
 
-const showCreateButton = ref(localStorage.getItem('showCreateButton') === 'true');
+// Définir une variable réactive pour contrôler la visibilité du bouton "Create account"
+const showCreateButton = ref(true);
 
+// Fonction pour masquer le bouton "Create account"
 const hideCreateButton = () => {
   showCreateButton.value = false;
-  localStorage.setItem('showCreateButton', 'false');
 }
 
 </script>
