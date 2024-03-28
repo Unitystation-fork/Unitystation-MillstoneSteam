@@ -70,6 +70,26 @@ npm run preview
 
 Pour accéder à l'aperçu de la version de production, visitez http://milestone.unionrolistes.fr:3000/ dans votre navigateur.
 
+## S'ajouter en ADMIN localement
+
+
+Voici les étapes à suivre pour se connecter en tant qu'administrateur :
+
+
+1. Copier le fichier `.default` en `.env` avec la commande `cp .default .env` puis le remplir avec un nom d'utilisateur et un mot de passe admin.
+
+
+2.  `node prisma/seed.js` pour injecter les données dans la base de données.
+
+  
+3. Exécuter la commande `npx prisma generate` pour générer cet utilisateur avec le rôle admin.
+
+  
+4. Ensuite, exécuter `npx prisma studio` pour vérifier que l'utilisateur a bien été créé.
+
+  
+5. Retirer le `await` de la fonction `bcrypt.compare` dans le fichier `login.post.ts` situé dans le dossier `\server\api\`.
+
 ## Installation sur un serveur de production (PROD)
 
 Après la connexion au serveur d'hébergement, suivez ces étapes pour installer le projet :
