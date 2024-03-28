@@ -5,18 +5,23 @@
 
     <p class="flag-container">
       <img class="flag" src="~/assets/img/flag-france.png" alt="french-flag" />
-      {{ frenchDate }}
+      {{ frenchTime }}
 
-      <div class="dropdown" @click="toggleDropdown">
-        <img class="flag" src="~/assets/img/flag-canada.png" alt="Select timezone">
-        <ul v-show="dropdownOpen" class="dropdown-menu">
-          <li v-for="(timezone, index) in timezones" :key="index" @click="selectTimezone(timezone)">
+      <!-- container for the canadian flag + the dropdown menu -->
+      <div class="dropdown" @click="toggleCanadianDropdown">
+        <img class="flag" src="~/assets/img/flag-canada.png" alt="canadian-flag">
+      {{ canadianTime }}
+      <!-- dropdown menu will appear when the flag is clicked -->
+        <ul v-show="canadianDropdownOpen" class="dropdown-menu">
+          <!-- v-for loop to display each timezone from the API -->
+          <li v-for="(timezone, index) in timezones" :key="`canadian-${index}`" @click.stop="selectTimezone(timezone)">
             <img :src="getFlagUrl(timezone)" :alt="`${timezone.text} flag`" />
             {{ timezone.text }}
           </li>
         </ul>
       </div>
-      {{ canadianDate }}
+
+      
     </p>
 
     <div class="btns">
@@ -29,68 +34,111 @@
 <!-- script UX and timezone API -->
 
 <script setup lang="ts">
-  import { ref } from 'vue';
+  import { computed, ref, onMounted, onUnmounted } from 'vue';
   import { useJwtStore } from "~/stores/jwt";
 
   // set "canadianDate" as a responsive ref => can be update
-  const canadianDate = ref('');
+  const canadianDropdownOpen = ref(false);
   //initialize timezones with empty array
   const timezones = ref<Timezone[]>([]); //store timezone from API
-  const apiKey = '1581ce3aefd3c42e5b2e68b91420997d'; 
   const selectedTimeZone = ref('Europe/Paris');
   const dropdownOpen = ref(false);
   const isLoadingTimezones = ref(true);
-  const frenchDate = ref('');
+  const now = ref(new Date());
 
+  const apiKey = '1581ce3aefd3c42e5b2e68b91420997d'; 
+
+  //define timezone interface
   interface Timezone {
     value: string;
     text: string;
   }
 
-  const toggleDropdown = () => {
-      dropdownOpen.value = !dropdownOpen.value;
+  //toggle the dropdown for canadian flag
+  const toggleCanadianDropdown = () => {
+      canadianDropdownOpen.value = !canadianDropdownOpen.value;
+      if (canadianDropdownOpen.value && timezones.value.length === 0) {
+        //load the timezones from the API when the dropdown is first opened
+        loadTimezones();
+      }
   };
 
-  //declare selectedTimeZone as a responsive ref
+  //define an interface for the API response
+  interface ApiResponse {
+    valueProperty: string;
+    textProperty: string;
+  }
+
+  //load the timezones from the API
+  const loadTimezones = async () => {
+    isLoadingTimezones.value = true;
+    try {
+      const response = await fetch('http://api.ipstack.com/2a01:e0a:bd3:2f50:b431:bbc9:da08:a9d2?access_key=1581ce3aefd3c42e5b2e68b91420997d');
+      const data = await response.json();
+      //transform data to match the timezone interface if necessary
+      timezones.value = data.map(tz => ({
+        value: tz.valueProperty,
+        text: tz.textProperty
+      }));
+    } catch (error) {
+      console.error("Failed to load timezones", error);
+    } finally {
+      isLoadingTimezones.value = false;
+    }
+  };
+
+  //when a timezone is selected from the dropdown
   const selectedTimezone = (timezone: Timezone) => {
     selectedTimeZone.value = timezone.value;
-    dropdownOpen.value = false;
+    canadianDropdownOpen.value = false;
     updateDate();
   };
   
-  //the function will update now + canadianDate based on the selected timezone
+  //function to update the current time, will be called when a timezone is selected
   const updateDate = () => {
-    const now = new Date();
-    canadianDate.value = now.toLocaleString("fr-CA", {
-      timeZone: selectedTimeZone.value,
-    });
-    frenchDate.value = now.toLocaleString("fr-FR");
+    now.value = new Date();
   };
-  
+
+  const canadianTime = computed(() => now.value.toLocaleTimeString("fr-FR", {
+      timeZone: 'America/Toronto',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+  }));
+
+  const frenchTime = computed(() => now.value.toLocaleTimeString("fr-FR", {
+      timeZone: 'Europe/Paris',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+  }));
+
+  //get the URL for the flag img based on the timezone
   const getFlagUrl = (timezone: Timezone): string => {
-    return 'path/to/flag/image.png'; //return path to the flag img based on the timezone
+    return `path/to/flag/${timezone.value.toLowerCase()}.png`; 
   };  
 
-  //initialize the jwtStore with the useJwtStore composable
+  //initialize the jwtStore
   const jwtStore = useJwtStore();
 
+  let intervalId: number;
+
   //add the hook onMounted to charge the timezone from API
-  onMounted(async () => {
-    try {
-      const response = await fetch('http://api.ipstack.com/2a01:e0a:bd3:2f50:b431:bbc9:da08:a9d2?access_key=1581ce3aefd3c42e5b2e68b91420997d');
-      if (response.ok) {
-        const data = await response.json();
-        timezones.value = data.timezones;
-        isLoadingTimezones.value = false;
-      } else {
-        throw new Error('Erreur lors de la récupération des fuseaux horaires');
-      }
-    } catch (error) {
-      console.error(error instanceof Error ? error.message : error);
+  onMounted(() => {
+    if (process.client) {
+      updateDate();
+      intervalId = window.setInterval(() => {
+        now.value = new Date();
+      }, 1000); 
     }
   });
 
-  updateDate();
+  onUnmounted(() => {
+    window.clearInterval(intervalId);
+  });
+  
 </script>
 
 
