@@ -39,10 +39,13 @@
 
   // set "canadianDate" as a responsive ref => can be update
   const canadianDropdownOpen = ref(false);
+
+  watch(canadianDropdownOpen, (newVal) => {
+    console.log("Dropdown state changed:", newVal);
+  });
   //initialize timezones with empty array
   const timezones = ref<Timezone[]>([]); //store timezone from API
   const selectedTimeZone = ref('Europe/Paris');
-  const dropdownOpen = ref(false);
   const isLoadingTimezones = ref(true);
   const now = ref(new Date());
 
@@ -57,6 +60,7 @@
   //toggle the dropdown for canadian flag
   const toggleCanadianDropdown = () => {
       canadianDropdownOpen.value = !canadianDropdownOpen.value;
+      console.log("Canadian dropdown is now:", canadianDropdownOpen.value ? "Open" : "Closed");
       if (canadianDropdownOpen.value && timezones.value.length === 0) {
         //load the timezones from the API when the dropdown is first opened
         loadTimezones();
@@ -74,12 +78,13 @@
     isLoadingTimezones.value = true;
     try {
       const response = await fetch('http://api.ipstack.com/2a01:e0a:bd3:2f50:b431:bbc9:da08:a9d2?access_key=1581ce3aefd3c42e5b2e68b91420997d');
-      const data = await response.json();
+      const data: ApiResponse[] = await response.json();
+      console.log("Timezones loaded:", data);
       //transform data to match the timezone interface if necessary
-      timezones.value = data.map(tz => ({
+      timezones.value = data.map((tz: ApiResponse) => ({
         value: tz.valueProperty,
         text: tz.textProperty
-      }));
+      })); 
     } catch (error) {
       console.error("Failed to load timezones", error);
     } finally {
