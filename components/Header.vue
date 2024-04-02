@@ -43,6 +43,7 @@
   watch(canadianDropdownOpen, (newVal) => {
     console.log("Dropdown state changed:", newVal);
   });
+
   //initialize timezones with empty array
   const timezones = ref<Timezone[]>([]); //store timezone from API
   const selectedTimeZone = ref('Europe/Paris');
@@ -60,7 +61,7 @@
   //toggle the dropdown for canadian flag
   const toggleCanadianDropdown = () => {
       canadianDropdownOpen.value = !canadianDropdownOpen.value;
-      console.log("Canadian dropdown is now:", canadianDropdownOpen.value ? "Open" : "Closed");
+      console.log("Dropdown Open State: ", canadianDropdownOpen.value);
       if (canadianDropdownOpen.value && timezones.value.length === 0) {
         //load the timezones from the API when the dropdown is first opened
         loadTimezones();
@@ -69,22 +70,21 @@
 
   //define an interface for the API response
   interface ApiResponse {
-    valueProperty: string;
-    textProperty: string;
+    timezone: string;
+    gmtOffset: number;
   }
 
   //load the timezones from the API
   const loadTimezones = async () => {
     isLoadingTimezones.value = true;
     try {
-      const response = await fetch('http://api.ipstack.com/2a01:e0a:bd3:2f50:b431:bbc9:da08:a9d2?access_key=1581ce3aefd3c42e5b2e68b91420997d');
-      const data: ApiResponse[] = await response.json();
-      console.log("Timezones loaded:", data);
-      //transform data to match the timezone interface if necessary
-      timezones.value = data.map((tz: ApiResponse) => ({
-        value: tz.valueProperty,
-        text: tz.textProperty
-      })); 
+      const response = await fetch('http://api.ipstack.com/2a01:e0a:bd3:2f50:b431:bbc9:da08:a9d2?access_key=1581ce3aefd3c42e5b2e68b91420997d' + apiKey);
+      const data = await response.json();
+      if (!response.ok || data.success === false) {
+        console.error("API error: ", data.error);
+      } else {
+        console.error("Unexpected API response format: ", data);
+      }
     } catch (error) {
       console.error("Failed to load timezones", error);
     } finally {
@@ -127,17 +127,14 @@
 
   //initialize the jwtStore
   const jwtStore = useJwtStore();
-
   let intervalId: number;
 
   //add the hook onMounted to charge the timezone from API
   onMounted(() => {
-    if (process.client) {
       updateDate();
       intervalId = window.setInterval(() => {
         now.value = new Date();
       }, 1000); 
-    }
   });
 
   onUnmounted(() => {
