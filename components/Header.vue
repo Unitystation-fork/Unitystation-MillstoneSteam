@@ -17,9 +17,15 @@
       {{ canadianDate }}
     </p>
 
+    <div class="btns" v-if="!jwtStore.jwt">
+      <a href="https://vu.fr/mGJw" target="_blank">
+        <button @click="hideCreateButton">Create account</button>
+      </a>
+    </div>
+
     <div class="btns">
-      <button v-if="!jwtStore.jwt" @click="$emit('login')">Login</button>
-      <button v-if="jwtStore.jwt" @click="jwtStore.logout()">Logout</button>
+      <button v-if="!jwtStore.jwt" @click="$emit('login'), hideCreateButton">Login</button>
+      <button v-if="jwtStore.jwt" @click="jwtStore.logout(), showCreateButton">Logout</button>
     </div>
   </header>
 </template>
@@ -43,6 +49,7 @@ let canadianDate = now.toLocaleString("fr-FR", {
 });
 
 const jwtStore = useJwtStore();
+
 </script>
 
 <style scoped>
