@@ -23,12 +23,12 @@
         </div>
         <div>
           <label for="content">Description</label>
-          <input
+          <textarea
             name="content"
-            class="colorText inputStyleAdd"
+            class="colorText inputStyleAdd textStyleAdd"
             type="text"
-            v-model="content"
-          />
+            v-model="content">
+          </textarea>
         </div>
         <div class="content-private">
           <input
@@ -142,7 +142,9 @@ form {
   color: black;
   margin: 10px;
 }
-
+.content {
+  height: 10vw;
+}
 .bodydy {
   display: flex;
   justify-content: center;
@@ -156,9 +158,13 @@ form {
   color: white;
   margin: 1em;
   display: block;
-  min-width: 300px;
+  min-width: 30vw;
   padding: 0.4rem;
   border: 1px solid #2c2c3b;
+}
+.textStyleAdd {
+  text-align: justify;
+  min-height: 10vw;
 }
 
 .btnSubmitStyle {
