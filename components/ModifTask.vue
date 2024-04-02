@@ -10,7 +10,7 @@
         <label class="label" for="content">Descritpion</label>
         <textarea
           name="content"
-          class="inputStyle"
+          class="inputStyle textStyle"
           type="text"
           v-model="contentInput">
         </textarea>
@@ -117,9 +117,13 @@ label {
   color: white;
   margin: 1em;
   display: block;
-  width: 15vw;
+  width: 45vw;
   padding: 0.4rem;
   border: 1px solid #2c2c3b;
+}
+.textStyle{
+  height: 15vw;
+  text-align: justify;
 }
 
 .inputSubmit {
