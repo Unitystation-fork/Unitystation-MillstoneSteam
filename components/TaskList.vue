@@ -163,10 +163,6 @@ button:hover {
   width: 75vw; /* Updated by Mat95rix7 */
   background-color: #2c2c3b;
 }
-
-/* .tasks:nth-child(odd) {
-  
-} */
 .task-title {
   display: flex;
   justify-content: flex-start;

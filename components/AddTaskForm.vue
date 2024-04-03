@@ -142,9 +142,6 @@ form {
   color: black;
   margin: 10px;
 }
-.content {
-  height: 10vw;
-}
 .bodydy {
   display: flex;
   justify-content: center;
