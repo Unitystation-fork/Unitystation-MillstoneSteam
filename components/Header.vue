@@ -32,9 +32,8 @@
 </template>
 
 <!-- script UX and timezone API -->
-
 <script setup lang="ts">
-  import { computed, ref, onMounted, onUnmounted } from 'vue';
+  import { ref, onMounted, onUnmounted, nextTick, computed } from 'vue';
   import { useJwtStore } from "~/stores/jwt";
 
   // set "canadianDate" as a responsive ref => can be update
@@ -47,10 +46,8 @@
   //initialize timezones with empty array
   const timezones = ref<Timezone[]>([]); //store timezone from API
   const selectedTimeZone = ref('Europe/Paris');
-  const isLoadingTimezones = ref(true);
-  const now = ref(new Date());
-
-  const apiKey = '1581ce3aefd3c42e5b2e68b91420997d'; 
+  const isLoadingTimezones = ref(false);
+  const now = ref(new Date()); 
 
   //define timezone interface
   interface Timezone {
@@ -60,43 +57,43 @@
 
   //toggle the dropdown for canadian flag
   const toggleCanadianDropdown = () => {
-      canadianDropdownOpen.value = !canadianDropdownOpen.value;
-      console.log("Dropdown Open State: ", canadianDropdownOpen.value);
-      if (canadianDropdownOpen.value && timezones.value.length === 0) {
-        //load the timezones from the API when the dropdown is first opened
-        loadTimezones();
-      }
+    canadianDropdownOpen.value = !canadianDropdownOpen.value;
+    if (canadianDropdownOpen.value && !timezones.value.length) {
+       loadTimezones();
+    }
   };
 
-  //define an interface for the API response
-  interface ApiResponse {
-    timezone: string;
-    gmtOffset: number;
-  }
+  const apiKey = '1581ce3aefd3c42e5b2e68b91420997d';
+  const baseURL = 'http://api.ipstack.com';
+  const userIpAddress = '134.201.250.155';
 
   //load the timezones from the API
-  const loadTimezones = async () => {
+  async function loadTimezones() {
     isLoadingTimezones.value = true;
+    const fullUrl = `${baseURL}/${userIpAddress}?access_key=${apiKey}`;
     try {
-      const response = await fetch('http://api.ipstack.com/2a01:e0a:bd3:2f50:b431:bbc9:da08:a9d2?access_key=1581ce3aefd3c42e5b2e68b91420997d' + apiKey);
+      const response = await fetch(fullUrl);
       const data = await response.json();
-      if (!response.ok || data.success === false) {
-        console.error("API error: ", data.error);
+      console.log("API response: ", data);
+      if (response.ok && data.location && data.location.time_zone) {
+        timezones.value = [{
+          value: data.location.geoname_id,
+          text: `GMT${data.location.time_zone.offset}`,
+        }];
       } else {
-        console.error("Unexpected API response format: ", data);
+        console.log("API error: ", data.error ? data.error.info : 'Unknow error');
       }
     } catch (error) {
-      console.error("Failed to load timezones", error);
+      console.error("Failed to load timezones due to an exception : ", error);
     } finally {
       isLoadingTimezones.value = false;
     }
-  };
+  }
 
   //when a timezone is selected from the dropdown
   const selectedTimezone = (timezone: Timezone) => {
     selectedTimeZone.value = timezone.value;
     canadianDropdownOpen.value = false;
-    updateDate();
   };
   
   //function to update the current time, will be called when a timezone is selected
@@ -127,13 +124,13 @@
 
   //initialize the jwtStore
   const jwtStore = useJwtStore();
-  let intervalId: number;
 
+  let intervalId: number;
   //add the hook onMounted to charge the timezone from API
   onMounted(() => {
       updateDate();
       intervalId = window.setInterval(() => {
-        now.value = new Date();
+        updateDate();
       }, 1000); 
   });
 
