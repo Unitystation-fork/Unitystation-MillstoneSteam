@@ -7,19 +7,21 @@
       <img class="flag" src="~/assets/img/flag-france.png" alt="french-flag" />
       {{ frenchTime }}
 
-      <!-- container for the canadian flag + the dropdown menu -->
-      <div class="dropdown" @click="toggleCanadianDropdown">
-        <img class="flag" src="~/assets/img/flag-canada.png" alt="canadian-flag">
+    <!-- container for the canadian flag + the dropdown menu -->
+    <div class="dropdown" @click="toggleCanadianDropdown">
+      <img class="flag" src="~/assets/img/flag-canada.png" alt="canadian-flag">
       {{ canadianTime }}
       <!-- dropdown menu will appear when the flag is clicked -->
-        <ul v-show="canadianDropdownOpen" class="dropdown-menu">
+      <client-only>
+        <ul v-if="canadianDropdownOpen && timezones.length > 0" class="dropdown-menu">
           <!-- v-for loop to display each timezone from the API -->
           <li v-for="(timezone, index) in timezones" :key="`canadian-${index}`" @click.stop="selectTimezone(timezone)">
             <img :src="getFlagUrl(timezone)" :alt="`${timezone.text} flag`" />
             {{ timezone.text }}
           </li>
         </ul>
-      </div>
+      </client-only>
+    </div>
 
       
     </p>
@@ -57,10 +59,14 @@
 
   //toggle the dropdown for canadian flag
   const toggleCanadianDropdown = () => {
-    canadianDropdownOpen.value = !canadianDropdownOpen.value;
-    if (canadianDropdownOpen.value && !timezones.value.length) {
-       loadTimezones();
-    }
+    if (canadianDropdownOpen.value) {
+          loadTimezones();
+      }
+      canadianDropdownOpen.value = !canadianDropdownOpen.value;
+  };
+
+  const testDropdown = () => {
+    canadianDropdownOpen.value = true;
   };
 
   const apiKey = '1581ce3aefd3c42e5b2e68b91420997d';
@@ -68,26 +74,27 @@
   const userIpAddress = '134.201.250.155';
 
   //load the timezones from the API
-  async function loadTimezones() {
+  const loadTimezones = async () => {
     isLoadingTimezones.value = true;
     const fullUrl = `${baseURL}/${userIpAddress}?access_key=${apiKey}`;
+
     try {
       const response = await fetch(fullUrl);
       const data = await response.json();
-      console.log("API response: ", data);
       if (response.ok && data.location && data.location.time_zone) {
         timezones.value = [{
           value: data.location.geoname_id,
           text: `GMT${data.location.time_zone.offset}`,
         }];
       } else {
-        console.log("API error: ", data.error ? data.error.info : 'Unknow error');
+        throw new Error(data.error ? data.error.info : 'Unknow error');
       }
     } catch (error) {
-      console.error("Failed to load timezones due to an exception : ", error);
+      console.error("API error : ", error);
     } finally {
       isLoadingTimezones.value = false;
     }
+    console.log("Fuseaux horaires chargés : ", timezones.value);
   }
 
   //when a timezone is selected from the dropdown
@@ -126,12 +133,13 @@
   const jwtStore = useJwtStore();
 
   let intervalId: number;
+
   //add the hook onMounted to charge the timezone from API
   onMounted(() => {
       updateDate();
-      intervalId = window.setInterval(() => {
-        updateDate();
-      }, 1000); 
+
+      intervalId = window.setInterval(updateDate, 1000);
+      testDropdown();
   });
 
   onUnmounted(() => {
