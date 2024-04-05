@@ -7,21 +7,22 @@
       <img class="flag" src="~/assets/img/flag-france.png" alt="french-flag" />
       {{ frenchTime }}
 
-    <!-- container for the canadian flag + the dropdown menu -->
-    <div class="dropdown" @click="toggleCanadianDropdown">
-      <img class="flag" src="~/assets/img/flag-canada.png" alt="canadian-flag">
-      {{ canadianTime }}
-      <!-- dropdown menu will appear when the flag is clicked -->
-      <client-only>
-        <ul v-if="canadianDropdownOpen && timezones.length > 0" class="dropdown-menu">
-          <!-- v-for loop to display each timezone from the API -->
-          <li v-for="(timezone, index) in timezones" :key="`canadian-${index}`" @click.stop="selectTimezone(timezone)">
-            <img :src="getFlagUrl(timezone)" :alt="`${timezone.text} flag`" />
-            {{ timezone.text }}
-          </li>
-        </ul>
-      </client-only>
-    </div>
+  <!-- container for the canadian flag + the dropdown menu -->
+  <div class="dropdown" @click="toggleCanadianDropdown">
+    <img class="flag" src="~/assets/img/flag-canada.png" alt="canadian-flag">
+    {{ canadianTime }}
+
+    <!-- dropdown menu will appear when the flag is clicked -->
+    <client-only>
+      <ul v-show="canadianDropdownOpen" class="dropdown-menu">
+        <!-- v-for loop to display each timezone from the API -->
+        <li v-for="(timezone, index) in timezones" :key="`canadian-${index}`" @click.stop="selectTimezone(timezone)">
+          <span class="flag-emoji">{{ countryCodeToFlagEmoji(timezone.countryCode) }}</span>
+          {{  timezone.text }}
+        </li>
+      </ul>
+    </client-only>
+  </div>
 
       
     </p>
@@ -55,47 +56,82 @@
   interface Timezone {
     value: string;
     text: string;
+    countryCode: string;
   }
 
   //toggle the dropdown for canadian flag
   const toggleCanadianDropdown = () => {
+  canadianDropdownOpen.value = !canadianDropdownOpen.value;
+  console.log('toggleCanadianDropdown called, new value:', canadianDropdownOpen.value);
+  //load time zones only if the dropdown is open and time zones are not already loaded
     if (canadianDropdownOpen.value) {
-          loadTimezones();
-      }
-      canadianDropdownOpen.value = !canadianDropdownOpen.value;
+      loadTimezones();
+    }
+      //force the DOM to update
+      nextTick(() => {
+        console.log('The DOM should now have updated');
+      });
   };
 
   const testDropdown = () => {
     canadianDropdownOpen.value = true;
   };
 
-  const apiKey = '1581ce3aefd3c42e5b2e68b91420997d';
-  const baseURL = 'http://api.ipstack.com';
-  const userIpAddress = '134.201.250.155';
+  const timeZoneDBApiKey = 'LSINUF5SW6UO';
+  // const flagEmojis = {
+  //   "France": "FR",
+  //   "Canada": "CA",
+  //   "Japon": "JP",
+  //   "Allemagne": "DE",
+  //   "Italie": "IT",
+  //   "Spain": "ES",
+  //   "Royaume-Uni": "GB",
+  //   "Chine": "CN",
+  //   "Inde": "IN",
+  //   "Brésil": "BR",
+  //   "Australie": "AU",
+  //   "Mexique": "MX",
+  //   "Corée du Sud": "KR",
+  //   "Pays-Bas": "NL",
+  //   "Russie": "RU",
+  //   "Afrique du Sud": "ZA",
+  //   "Nouvelle-Zélande": "NZ",
+  //   "Singapour": "SG",
+  //   "Nigéria": "NG",
+  // };
 
   //load the timezones from the API
   const loadTimezones = async () => {
-    isLoadingTimezones.value = true;
-    const fullUrl = `${baseURL}/${userIpAddress}?access_key=${apiKey}`;
+  isLoadingTimezones.value = true;
+  const timeZoneDBApiUrl = `http://api.timezonedb.com/v2.1/list-time-zone?key=${timeZoneDBApiKey}&format=json`;
 
-    try {
-      const response = await fetch(fullUrl);
-      const data = await response.json();
-      if (response.ok && data.location && data.location.time_zone) {
-        timezones.value = [{
-          value: data.location.geoname_id,
-          text: `GMT${data.location.time_zone.offset}`,
-        }];
-      } else {
-        throw new Error(data.error ? data.error.info : 'Unknow error');
-      }
-    } catch (error) {
-      console.error("API error : ", error);
-    } finally {
-      isLoadingTimezones.value = false;
+  try {
+    const response = await fetch(timeZoneDBApiUrl);
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error("Error fetching the time zones");
     }
-    console.log("Fuseaux horaires chargés : ", timezones.value);
+
+    timezones.value = data.zones.map((zone: { zoneName: string; countryName: string; countryCode: string }) => ({
+      value: zone.zoneName, 
+      text: zone.countryName,
+      countryCode: zone.countryCode
+    })).sort((a: Timezone, b: Timezone) => a.text.localeCompare(b.text));
+
+  } catch (error) {
+    console.error("API error:", error);
+  } finally {
+    isLoadingTimezones.value = false;
   }
+};
+
+//utility function to convert country code to flag emoji
+function countryCodeToFlagEmoji(countryCode: string): string {
+  const codePoints = countryCode.toUpperCase().split('').map(char =>  127397 + char.charCodeAt(0));
+  return String.fromCodePoint(...codePoints);
+}
+
 
   //when a timezone is selected from the dropdown
   const selectedTimezone = (timezone: Timezone) => {
@@ -137,9 +173,14 @@
   //add the hook onMounted to charge the timezone from API
   onMounted(() => {
       updateDate();
-
       intervalId = window.setInterval(updateDate, 1000);
-      testDropdown();
+      // testDropdown();
+
+      //static data for testing
+      // timezones.value = [
+      //   { value: 'GMT-5', text: 'Toronto'},
+      //   { value: 'GMT-6', text: 'Vancouver'}
+      // ];
   });
 
   onUnmounted(() => {
@@ -205,6 +246,10 @@ img {
   cursor: pointer;
 }
 
+.flag-emoji {
+  font-size: 1.2em;
+}
+
 .dropdown {
   position: relative;
   cursor: pointer;
@@ -220,6 +265,8 @@ img {
   margin: 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   z-index: 1000;
+  max-height: 200px; 
+  overflow-y: auto; 
 }
 
 .dropdown-menu[style*="display: none;"] {
