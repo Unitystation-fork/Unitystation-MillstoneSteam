@@ -34,9 +34,6 @@
             edit
           </span>
         </div>
-        <!-- <p class="content" v-if="!task.isContentPrivate || jwtStore.jwt">
-          {{ task.content }}
-        </p> -->
         <div class="content" v-if="!task.isContentPrivate || jwtStore.jwt" v-html="renderMarkdown(task.content)">
         </div>
         <ModifTask
