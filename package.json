@@ -24,6 +24,7 @@
         "bcrypt": "^5.1.0",
         "dotenv": "^16.0.3",
         "jsonwebtoken": "^9.0.0",
+        "markdown-it": "^14.1.0",
         "nuxt-start": "^2.15.8",
         "pinia": "^2.0.23",
         "pinia-plugin-persistedstate": "^2.3.0"

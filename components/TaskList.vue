@@ -34,10 +34,8 @@
             edit
           </span>
         </div>
-        <p class="content" v-if="!task.isContentPrivate || jwtStore.jwt">
-          {{ task.content }}
-        </p>
-
+        <div class="content" v-if="!task.isContentPrivate || jwtStore.jwt" v-html="renderMarkdown(task.content)">
+        </div>
         <ModifTask
           v-bind="task"
           v-if="jwtStore.role === 'ADMIN' && isModifShown"
@@ -52,6 +50,7 @@
 </template>
 
 <script setup>
+import MarkdownIt from 'markdown-it';
 import { useTaskStore } from "~/stores/task";
 import { useJwtStore } from "~~/stores/jwt";
 const taskStore = useTaskStore();
@@ -61,6 +60,8 @@ const tasks = taskStore.tasks.value
 const jwtStore = useJwtStore();
 const isModifShown = ref(false);
 const error = ref("");
+
+const md = new MarkdownIt();
 
 const endTaskEdit = () => {
   taskStore.tasks.sort((a, b) => {
@@ -95,6 +96,10 @@ async function deleteTask(id) {
   }
   return;
 }
+
+const renderMarkdown = (markdownText) => {
+  return md.render(markdownText);
+};
 </script>
 
 <style scoped>
