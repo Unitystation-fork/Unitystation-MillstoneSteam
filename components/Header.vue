@@ -37,12 +37,12 @@
 
 <!-- script UX and timezone API -->
 <script setup lang="ts">
-  import { ref, watch, onMounted, onUnmounted, computed } from 'vue';
+  import { ref, watch, onMounted, onUnmounted, computed, nextTick } from 'vue';
   import { useJwtStore } from "~/stores/jwt";
 
   //initializing reactive variables
   const canadianDropdownOpen = ref(false); //canadian dropdown status
-  const selectedFlagImg = ref('~/assets/img/flag-canada.png');
+  const selectedFlagImg = ref('https://flagcdn.com/h240/ca.png');
   //API key to access TimeZoneDB
   const timeZoneDBApiKey = 'LSINUF5SW6UO';
   // const selectedFlagCode = ref('ca');
