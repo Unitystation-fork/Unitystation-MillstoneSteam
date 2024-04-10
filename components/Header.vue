@@ -3,22 +3,31 @@
     <img src="@/assets/img/305474881_500277108772915_4425958856109240367_n.jpg" alt="twitch"/>
     <h1>Bienvenue sur le projet milestone !</h1>
 
+    <!--container for flags + time display-->
     <p class="flag-container">
       <img class="flag" src="~/assets/img/flag-france.png" alt="french-flag" />
-      {{ frenchDate }}
+      {{ frenchTime }}
 
-      <div class="dropdown" @click="toggleDropdown">
-        <img class="flag" src="~/assets/img/flag-canada.png" alt="Select timezone">
-        <ul v-show="dropdownOpen" class="dropdown-menu">
-          <li v-for="(timezone, index) in timezones" :key="index" @click="selectTimezone(timezone)">
-            <img :src="getFlagUrl(timezone)" :alt="`${timezone.text} flag`" />
-            {{ timezone.text }}
-          </li>
-        </ul>
-      </div>
-      {{ canadianDate }}
+  <!-- container for canadian flag + the dropdown menu -->
+  <div class="dropdown" @click="toggleCanadianDropdown">
+    <img class="flag" :src="selectedFlagImg" alt="Selected flag" /> 
+    <span class="dropdown-indicator">&#9660;</span>
+    {{ canadianTime }}
+
+    <!-- dropdown menu will appear when the flag is clicked -->
+    <client-only> 
+      <ul v-show="canadianDropdownOpen" class="dropdown-menu">
+        <!--loop to display each timezone from the API -->
+        <li v-for="(timezone, index) in timezones" :key="`canadian-${index}`" @click.stop="selectTimezone(timezone)">
+          <span class="flag-emoji">{{ countryCodeToFlagEmoji(timezone.countryCode) }}</span>
+          {{  timezone.text }}
+        </li>
+      </ul>
+    </client-only>
+  </div>
+      
     </p>
-
+    <!--conditional connect/disconnect buttons-->
     <div class="btns">
       <button v-if="!jwtStore.jwt" @click="$emit('login')">Login</button>
       <button v-if="jwtStore.jwt" @click="jwtStore.logout()">Logout</button>
@@ -27,70 +36,132 @@
 </template>
 
 <!-- script UX and timezone API -->
-
 <script setup lang="ts">
-  import { ref } from 'vue';
+  import { ref, watch, onMounted, onUnmounted, computed } from 'vue';
   import { useJwtStore } from "~/stores/jwt";
 
-  // set "canadianDate" as a responsive ref => can be update
-  const canadianDate = ref('');
+  //initializing reactive variables
+  const canadianDropdownOpen = ref(false); //canadian dropdown status
+  const selectedFlagImg = ref('~/assets/img/flag-canada.png');
+  //API key to access TimeZoneDB
+  const timeZoneDBApiKey = 'LSINUF5SW6UO';
+  // const selectedFlagCode = ref('ca');
+
   //initialize timezones with empty array
   const timezones = ref<Timezone[]>([]); //store timezone from API
-  const apiKey = '1581ce3aefd3c42e5b2e68b91420997d'; 
-  const selectedTimeZone = ref('Europe/Paris');
-  const dropdownOpen = ref(false);
-  const isLoadingTimezones = ref(true);
-  const frenchDate = ref('');
+  const selectedTimeZone = ref('America/Toronto'); //timezone selected by default
+  const isLoadingTimezones = ref(false); //timezone loading status
+  const now = ref(new Date()); //actual hour
 
-  interface Timezone {
-    value: string;
-    text: string;
-  }
-
-  const toggleDropdown = () => {
-      dropdownOpen.value = !dropdownOpen.value;
-  };
-
-  //declare selectedTimeZone as a responsive ref
-  const selectedTimezone = (timezone: Timezone) => {
-    selectedTimeZone.value = timezone.value;
-    dropdownOpen.value = false;
-    updateDate();
-  };
-  
-  //the function will update now + canadianDate based on the selected timezone
-  const updateDate = () => {
-    const now = new Date();
-    canadianDate.value = now.toLocaleString("fr-CA", {
-      timeZone: selectedTimeZone.value,
-    });
-    frenchDate.value = now.toLocaleString("fr-FR");
-  };
-  
-  const getFlagUrl = (timezone: Timezone): string => {
-    return 'path/to/flag/image.png'; //return path to the flag img based on the timezone
-  };  
-
-  //initialize the jwtStore with the useJwtStore composable
-  const jwtStore = useJwtStore();
-
-  //add the hook onMounted to charge the timezone from API
-  onMounted(async () => {
-    try {
-      const response = await fetch('http://api.ipstack.com/2a01:e0a:bd3:2f50:b431:bbc9:da08:a9d2?access_key=1581ce3aefd3c42e5b2e68b91420997d');
-      if (response.ok) {
-        const data = await response.json();
-        timezones.value = data.timezones;
-        isLoadingTimezones.value = false;
-      } else {
-        throw new Error('Erreur lors de la récupération des fuseaux horaires');
-      }
-    } catch (error) {
-      console.error(error instanceof Error ? error.message : error);
+  //viewer for dropdown menu state
+  watch(selectedTimeZone, (newValue, oldValue) => {
+    if (newValue !== oldValue) {
+      console.log("Timezone changed: ", newValue);
     }
   });
 
-  updateDate();
+  //define timezone interface
+  interface Timezone {
+    value: string;
+    text: string;
+    countryCode: string;
+  }
+
+  const selectTimezone = (timezone: Timezone) => {
+      selectedTimeZone.value = timezone.value;
+      canadianDropdownOpen.value = false; //close the dropdown
+      
+      selectedFlagImg.value = `https://flagcdn.com/h240/${timezone.countryCode.toLowerCase()}.png`;
+      updateDate();
+  };
+
+  //function to toggle canadian dropdown menu state 
+  const toggleCanadianDropdown = () => {
+  canadianDropdownOpen.value = !canadianDropdownOpen.value;
+  console.log('toggleCanadianDropdown called, new value:', canadianDropdownOpen.value);
+  //load time zones only if the dropdown is open
+    if (canadianDropdownOpen.value) {
+      loadTimezones();
+    }
+      //force the DOM to update
+      nextTick(() => {
+        console.log('The DOM should now have updated');
+      });
+  };
+
+
+
+  //function to load timezones from API
+  const loadTimezones = async () => {
+  isLoadingTimezones.value = true;
+  const timeZoneDBApiUrl = `http://api.timezonedb.com/v2.1/list-time-zone?key=${timeZoneDBApiKey}&format=json`;
+
+  try {
+    const response = await fetch(timeZoneDBApiUrl);
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error("Error fetching the time zones");
+    }
+  
+    //updating timezone list with API data
+    timezones.value = data.zones.map((zone: { zoneName: string; countryName: string; countryCode: string }) => ({
+      value: zone.zoneName, 
+      text: zone.countryName,
+      countryCode: zone.countryCode
+    })).sort((a: Timezone, b: Timezone) => a.text.localeCompare(b.text));
+
+  } catch (error) {
+    console.error("API error:", error);
+  } finally {
+    isLoadingTimezones.value = false;
+  }
+};
+
+//utility function to convert country code to flag emoji
+function countryCodeToFlagEmoji(countryCode: string): string {
+  const codePoints = countryCode.toUpperCase().split('').map(char =>  127397 + char.charCodeAt(0));
+  return String.fromCodePoint(...codePoints);
+}
+  
+  //function to update the current time, will be called when a timezone is selected
+  const updateDate = () => {
+    now.value = new Date();
+  };
+
+  //calculated functions for displaying time based on selected timezones
+  const canadianTime = computed(() => now.value.toLocaleTimeString("fr-FR", {
+      timeZone: selectedTimeZone.value,
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+  }));
+
+  const frenchTime = computed(() => now.value.toLocaleTimeString("fr-FR", {
+      timeZone: 'Europe/Paris',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+  }));
+
+  //initialization of the store for JWT management
+  const jwtStore = useJwtStore();
+
+  let intervalId: number;
+
+  //hook executed after mounting the component
+  onMounted(() => {
+      updateDate(); //updates current time
+      intervalId = window.setInterval(updateDate, 1000); //updates the time every second
+  });
+
+  //hook executed before component unmount
+  onUnmounted(() => {
+    window.clearInterval(intervalId); //stop updating time 
+  });
+  
 </script>
 
 
@@ -150,11 +221,19 @@ img {
   cursor: pointer;
 }
 
+.flag-emoji {
+  font-size: 1.2em;
+}
+
 .dropdown {
   position: relative;
   cursor: pointer;
 }
 
+.dropdown-indicator {
+  user-select: none;
+  margin-left: 5px;
+}
 .dropdown-menu {
   position: absolute;
   top: 100%;
@@ -165,6 +244,8 @@ img {
   margin: 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   z-index: 1000;
+  max-height: 200px; 
+  overflow-y: auto; 
 }
 
 .dropdown-menu[style*="display: none;"] {
