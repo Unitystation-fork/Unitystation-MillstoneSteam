@@ -50,11 +50,10 @@
   let intervalId: number;
 
     const timezones: Timezone[] = [
-        { label: 'Canada', timezone: 'America/Toronto', flagUrl: "flag-france.png"},
+        { label: 'Canada', timezone: 'America/Toronto', flagUrl: "flag-canada.png"},
         { label: 'USA Ouest', timezone: 'America/Los_Angeles', flagUrl: "flag-usa.png"},
         { label: 'USA Centre', timezone: 'America/Chicago', flagUrl: "flag-usa.png"},
-        { label: 'USA Est', timezone: 'America/New York', flagUrl: "flag-usa.png"},
-        { label: 'UK', timezone: 'Europe/London', flagUrl: "flag-uk.png"},
+        { label: 'United Kingdom', timezone: 'Europe/London', flagUrl: "flag-uk.png"},
         { label: 'Russie', timezone: 'Europe/Moscow', flagUrl: "flag-russia.png"},
         { label: 'Australie', timezone: 'Australia/Sydney', flagUrl: "flag-australia.png"},
         { label: 'Guadeloupe', timezone: 'America/Guadeloupe', flagUrl: "flag-guadeloupe.png"},
@@ -73,9 +72,9 @@
     now.value = new Date(); // Update the current time
   };
 
-  const getFlagUrl = (path) => {
+  const getFlagUrl = (path: string) => {
     return new URL(`../assets/img/${path}`, import.meta.url).href;
-  }
+  };
 
   const toggleCanadianDropdown = () => {
     canadianDropdownOpen.value = !canadianDropdownOpen.value;
