@@ -12,7 +12,7 @@
         </button>
         <h2>Connexion</h2>
         <div class="form-group">
-          <label for="password">Nom d'utilisateur</label>
+          <label for="username">Nom d'utilisateur</label>
           <input
             type="text"
             class="form-control"
