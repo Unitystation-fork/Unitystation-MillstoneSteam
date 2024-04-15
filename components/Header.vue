@@ -7,18 +7,21 @@
     <!--container for flags + time display-->
     <p class="flag-container">
       <img class="flag" src="~/assets/img/flag-france.png" alt="french-flag" />
+      <!-- display time in france's timezone -->
       {{ frenchTime }}
 
   <!-- container for canadian flag + the dropdown menu -->
   <div class="dropdown" @click="toggleCanadianDropdown">
+    <!-- dynamic image for displaying the selected flag -->
     <img class="flag" :src="getFlagUrl(selectedTimeZone.flagUrl)" :alt="selectedTimeZone.label" /> 
     <span class="dropdown-indicator">&#9660;</span>
+    <!-- display time in the selected timezone -->
     {{ canadianTime }}
 
     <!-- dropdown menu will appear when the flag is clicked -->
     <client-only> 
       <ul v-show="canadianDropdownOpen" class="dropdown-menu">
-        <!-- When a timezone is clicked, select it and update the flag and time -->
+        <!-- loop over timezones for user to select -->
       <li v-for="timezone in timezones" :key="timezone.label" @click="selectTimeZone(timezone)">
         {{ timezone.label }}
         </li>
@@ -27,7 +30,7 @@
   </div>
       
     </p>
-    <!--conditional connect/disconnect buttons-->
+    <!--connect/disconnect buttons-->
     <div class="btns">
       <button v-if="!jwtStore.jwt" @click="$emit('login')">Login</button>
       <button v-if="jwtStore.jwt" @click="jwtStore.logout()">Logout</button>
@@ -36,22 +39,26 @@
 </template>
 
 <!-- script UX and timezone API -->
-
-<!-- script UX and timezone API -->
 <script setup lang="ts">
+// vue and project specific imports
   import { ref, onMounted, onUnmounted, computed } from 'vue';
   import { useJwtStore } from "~/stores/jwt";
 
+  // type definition for the timezone objects
   interface Timezone {
     label: string;
     timezone: string;
     flagUrl: string;
   }
 
+  // using JWT store for authentification status
   const jwtStore = useJwtStore();
-  const now = ref(new Date()); //actual hour
+  // reactive reference for the current date and time
+  const now = ref(new Date());
+  // reference to the interval for updating the time
   let intervalId: number;
 
+    // predefined list of timezones with their corresponding flags and labels
     const timezones: Timezone[] = [
         { label: 'Canada', timezone: 'America/Toronto', flagUrl: "flag-canada.png"},
         { label: 'USA Ouest', timezone: 'America/Los_Angeles', flagUrl: "flag-usa.png"},
@@ -65,30 +72,34 @@
         { label: 'La Réunion', timezone: 'Indian/Reunion', flagUrl: "flag-reunion.png"},
     ];
 
-  // Selected timezone
+  // reactive reference to the currently selected timezone, defaults to the first one
   const selectedTimeZone = ref<Timezone>(timezones[0]);
+  // reactive boolean to control the dropdown menu's visibility
   const canadianDropdownOpen = ref(false);
 
+  // function to select a timezone and update the flag and time
   const selectTimeZone = (timezone: Timezone) => {
-    selectedTimeZone.value = timezone; // This will change both the flag and the timezone
-    canadianDropdownOpen.value = false; // Close the dropdown menu
-    now.value = new Date(); // Update the current time
+    selectedTimeZone.value = timezone; // this will change both the flag and the timezone
+    canadianDropdownOpen.value = false; // close the dropdown menu
+    now.value = new Date(); // update the current time
   };
 
+  // function to convert flag URL path to a fully qualified URL
   const getFlagUrl = (path: string) => {
     return new URL(`../assets/img/${path}`, import.meta.url).href;
   };
 
+  // function to toggle the visibility of the dropdown menu
   const toggleCanadianDropdown = () => {
     canadianDropdownOpen.value = !canadianDropdownOpen.value;
   };
 
-  // Update the current time every second
+  // Update to update the current time
   const updateDate = () => {
     now.value = new Date();
   };
 
-  //calculated functions for displaying time based on selected timezones
+  // computed property to get the current time in the selected timezone
   const canadianTime = computed(() => {
     return now.value.toLocaleTimeString("fr-FR", {
       timeZone: selectedTimeZone.value.timezone,
@@ -99,6 +110,7 @@
     });
   });
 
+  // computed property to get the current time in france's timezone
   const frenchTime = computed(() => {
     return now.value.toLocaleTimeString("fr-FR", {
       timeZone: 'Europe/Paris',
@@ -109,6 +121,7 @@
   });
 });
 
+// lifecycle hooks for creating and clearing the interval to update the time
 onMounted(() => {
   intervalId = window.setInterval(updateDate, 1000); // Use window.setInterval to make TypeScript happy
 });
