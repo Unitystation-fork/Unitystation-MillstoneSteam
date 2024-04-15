@@ -1,6 +1,7 @@
 <template>
   <header>
     <img src="@/assets/img/305474881_500277108772915_4425958856109240367_n.jpg" alt="twitch"/>
+    <img src="@/assets/img/305474881_500277108772915_4425958856109240367_n.jpg" alt="twitch"/>
     <h1>Bienvenue sur le projet milestone !</h1>
 
     <!--container for flags + time display-->
@@ -33,6 +34,8 @@
     </div>
   </header>
 </template>
+
+<!-- script UX and timezone API -->
 
 <!-- script UX and timezone API -->
 <script setup lang="ts">
@@ -117,6 +120,7 @@ onUnmounted(() => {
 </script>
 
 
+
 <style scoped>
 header {
   height: 64px;
@@ -149,6 +153,16 @@ img {
   width: 44px;
   clip-path: circle(50%);
   vertical-align: middle;
+}
+
+.hidden-select {
+  display: none;
+}
+
+.flag-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .hidden-select {
