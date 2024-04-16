@@ -15,7 +15,7 @@ const deleteTask = defineEventHandler(async (event) => {
     if (!token) {
       throw "No token provided";
     }
-    const decoded: string | JwtPayload = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded: string | JwtPayload = jwt.verify(token, process.env.JWT_SECRET!);
     if (!decoded || typeof decoded === "string") {
       throw "Invalid token";
     }

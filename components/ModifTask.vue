@@ -8,12 +8,12 @@
       </div>
       <div class="input">
         <label class="label" for="content">Descritpion</label>
-        <input
+        <textarea
           name="content"
-          class="inputStyle"
+          class="inputStyle textStyle"
           type="text"
-          v-model="contentInput"
-        />
+          v-model="contentInput">
+        </textarea>
       </div>
       <div class="checkboxInput">
         <input type="checkbox" v-model="completedInput" class="check" />
@@ -117,9 +117,13 @@ label {
   color: white;
   margin: 1em;
   display: block;
-  width: 15vw;
+  width: 45vw;
   padding: 0.4rem;
   border: 1px solid #2c2c3b;
+}
+.textStyle{
+  height: 15vw;
+  text-align: justify;
 }
 
 .inputSubmit {

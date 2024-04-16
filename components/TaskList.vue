@@ -34,10 +34,8 @@
             edit
           </span>
         </div>
-        <p class="content" v-if="!task.isContentPrivate || jwtStore.jwt">
-          {{ task.content }}
-        </p>
-
+        <div class="content" v-if="!task.isContentPrivate || jwtStore.jwt" v-html="renderMarkdown(task.content)">
+        </div>
         <ModifTask
           v-bind="task"
           v-if="jwtStore.role === 'ADMIN' && isModifShown"
@@ -52,6 +50,7 @@
 </template>
 
 <script setup>
+import MarkdownIt from 'markdown-it';
 import { useTaskStore } from "~/stores/task";
 import { useJwtStore } from "~~/stores/jwt";
 const taskStore = useTaskStore();
@@ -61,6 +60,8 @@ const tasks = taskStore.tasks.value
 const jwtStore = useJwtStore();
 const isModifShown = ref(false);
 const error = ref("");
+
+const md = new MarkdownIt();
 
 const endTaskEdit = () => {
   taskStore.tasks.sort((a, b) => {
@@ -95,6 +96,10 @@ async function deleteTask(id) {
   }
   return;
 }
+
+const renderMarkdown = (markdownText) => {
+  return md.render(markdownText);
+};
 </script>
 
 <style scoped>
@@ -153,18 +158,14 @@ button:hover {
   align-items: flex-start;
   margin-left: auto;
   margin-right: auto;
-  margin-top: 0;
-  margin-bottom: 0;
+  margin-top: 10px;
+  margin-bottom: 10px;
   padding-top: 32px;
   padding-bottom: 16px;
   padding-left: 1.8rem;
   padding-right: 1.2rem;
   border-radius: 3px;
-  min-width: 75vw;
-  max-width: 750px;
-}
-
-.tasks:nth-child(odd) {
+  width: 75vw; /* Updated by Mat95rix7 */
   background-color: #2c2c3b;
 }
 .task-title {
