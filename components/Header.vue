@@ -1,7 +1,6 @@
 <template>
   <header>
     <img src="@/assets/img/305474881_500277108772915_4425958856109240367_n.jpg" alt="twitch"/>
-    <img src="@/assets/img/305474881_500277108772915_4425958856109240367_n.jpg" alt="twitch"/>
     <h1>Bienvenue sur le projet milestone !</h1>
 
     <!--container for flags + time display-->
