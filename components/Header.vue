@@ -1,8 +1,10 @@
 <template>
   <header>
     <img src="@/assets/img/305474881_500277108772915_4425958856109240367_n.jpg" alt="twitch"/>
+    <img src="@/assets/img/305474881_500277108772915_4425958856109240367_n.jpg" alt="twitch"/>
     <h1>Bienvenue sur le projet milestone !</h1>
 
+    <!--container for flags + time display-->
     <!--container for flags + time display-->
     <p class="flag-container">
       <img class="flag" src="~/assets/img/flag-france.png" alt="french-flag" />
@@ -43,6 +45,7 @@
   import { ref, onMounted, onUnmounted, computed } from 'vue';
   import { useJwtStore } from "~/stores/jwt";
 
+  // type definition for the timezone objects
   // type definition for the timezone objects
   interface Timezone {
     label: string;

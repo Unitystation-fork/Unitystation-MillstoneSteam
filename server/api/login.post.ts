@@ -22,7 +22,8 @@ const login = defineEventHandler(async (event) => {
   // Discord user login without password
 
   if (password) {
-    const isPasswordCorrect = await bcrypt.compare(password, user.password!);
+    const isPasswordCorrect =  bcrypt.compare(password, user.password!);
+    
     if (!isPasswordCorrect) {
       throw {
         statusCode: 401,

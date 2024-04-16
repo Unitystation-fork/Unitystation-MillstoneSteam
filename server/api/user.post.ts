@@ -18,7 +18,7 @@ const createUser = defineEventHandler(async (event) => {
   const password = await bcrypt.hash(body.password, 10);
   const discordId = body.discordId;
   const twitchId = body.twitchId;
-  const auth = event.req.headers.authorization;
+  const auth = event.node.req.headers.authorization;
   const token = auth !== undefined ? auth.split(" ")[1] : null;
   try {
     // vérifiez la validité du jeton
@@ -27,7 +27,7 @@ const createUser = defineEventHandler(async (event) => {
     }
     const decoded: string | JwtPayload = jwt.verify(
       token,
-      process.env.JWT_SECRET
+      process.env.JWT_SECRET!
     );
     if (!decoded || typeof decoded === "string") {
       throw "Invalid token";

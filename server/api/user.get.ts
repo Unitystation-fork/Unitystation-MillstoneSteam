@@ -3,14 +3,14 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 const users = defineEventHandler(async (event) => {
-  const auth = event.req.headers.authorization;
+  const auth = event.node.req.headers.authorization;
   const token = auth !== undefined ? auth.split(" ")[1] : null;
   try {
     // verify the token and extract the user id from it
     if (!token || token === null) {
       throw "No token provided";
     }
-    const decoded: string | JwtPayload = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded: string | JwtPayload = jwt.verify(token, process.env.JWT_SECRET!);
     if (!decoded || typeof decoded === "string") {
       throw "Invalid token";
     }
@@ -25,19 +25,19 @@ const users = defineEventHandler(async (event) => {
       throw "User not found";
     }
 
-    const discordId = decoded.discordId;
-    const discord = await prisma.user.findUnique({
-      where: {
-        discordId: discordId,
-      },
-    });
+    // const discordId = decoded.discordId;
+    // const discord = await prisma.user.findUnique({
+    //   where: {
+    //     discorId: discordId
+    //   },
+    // });
 
-    if (discordId) {
-      // L'utilisateur a été trouvé
-      console.log(discordId);
-    } else {
-      console.log("Aucun utilisateur trouvé avec le discordId spécifié.");
-    }
+    // if (discordId) {
+    //   // L'utilisateur a été trouvé
+    //   console.log(discordId);
+    // } else {
+    //   console.log("Aucun utilisateur trouvé avec le discordId spécifié.");
+    // }
 
     //check if user is admin
     if (user.role !== "ADMIN") {
