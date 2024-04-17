@@ -4,9 +4,9 @@
       src="@/assets/img/305474881_500277108772915_4425958856109240367_n.jpg"
       alt="twitch"
     />
-    <h1>Bienvenue sur le projet milestone !</h1>
+    <h1 class="bienvenue">Bienvenue sur le projet milestone !</h1>
 
-    <p>
+    <p class="time">
       <img class="flag" src="~/assets/img/flag-france.png" alt="french-flag" />
       {{ frenchDate }}
       <img
@@ -61,11 +61,13 @@ header {
   align-items: center;
   width: 100%;
 }
-
+.bienvenue{
+  font-size: 2vw;
+}
 button {
   background-color: transparent;
   border: none;
-  font-size: 1.2rem;
+  font-size: 1.3vw;
   font-weight: 600;
   cursor: pointer;
   color: white;
@@ -87,13 +89,15 @@ img {
 }
 
 .flag {
-  height: 36px;
-  width: 36px;
+  height: 2.8vw;
+  width: 2.8vw;
   vertical-align: middle;
   margin-left: 10px;
   margin-bottom: 6px;
 }
-
+.time{
+  font-size: 1.5vw;
+}
 .add-btn {
   font-size: 1em;
 }
