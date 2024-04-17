@@ -6,151 +6,146 @@
     <!--container for flags + time display-->
     <p class="flag-container">
       <img class="flag" src="~/assets/img/flag-france.png" alt="french-flag" />
+      <!-- display time in france's timezone -->
       {{ frenchTime }}
-    </p>
 
-    <!-- container for canadian flag + the dropdown menu -->
+      <!-- container for canadian flag + the dropdown menu -->
     <div class="dropdown" @click="toggleCanadianDropdown">
-      <img class="flag" src="~/assets/img/flag-canada.png" alt="canadian-flag">
+      <!-- dynamic image for displaying the selected flag -->
+      <img class="flag" :src="getFlagUrl(selectedTimeZone.flagUrl)" :alt="selectedTimeZone.label" />
+      <span class="dropdown-indicator">&#9660;</span>
+      <!-- display time in the selected timezone -->
       {{ canadianTime }}
 
       <!-- dropdown menu will appear when the flag is clicked -->
       <client-only>
         <ul v-show="canadianDropdownOpen" class="dropdown-menu">
-          <!--loop to display each timezone from the API -->
-          <li v-for="(timezone, index) in timezones" :key="`canadian-${index}`" @click.stop="selectTimezone(timezone)">
-            <span class="flag-emoji">{{ countryCodeToFlagEmoji(timezone.countryCode) }}</span>
-            {{ timezone.text }}
+          <!-- loop over timezones for user to select -->
+          <li v-for="timezone in timezones" :key="timezone.label" @click="selectTimeZone(timezone)">
+            {{ timezone.label }}
           </li>
         </ul>
       </client-only>
     </div>
+
+
+    </p>
+    <!--conditional connect/disconnect buttons-->
     <div class="btns" v-if="!jwtStore.jwt">
       <a href="https://vu.fr/mGJw" target="_blank">
         <button @click="hideCreateButton">Create account</button>
       </a>
     </div>
+
     <div class="btns">
-      <button v-if="!jwtStore.jwt" @click="$emit('login'), hideCreateButton">Login</button>
-      <button v-if="jwtStore.jwt" @click="jwtStore.logout(), showCreateButton">Logout</button>
+      <button v-if="!jwtStore.jwt" @click="$emit('login')">Login</button>
+      <button v-if="jwtStore.jwt" @click="jwtStore.logout()">Logout</button>
     </div>
   </header>
 </template>
 
 <!-- script UX and timezone API -->
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, nextTick, computed } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useJwtStore } from "~/stores/jwt";
 
-//initializing reactive variables
-const canadianDropdownOpen = ref(false); //canadian dropdown status
 
-//viewer for dropdown menu state
-watch(canadianDropdownOpen, (newVal) => {
-  console.log("Dropdown state changed:", newVal);
-});
-
-//initialize timezones with empty array
-const timezones = ref<Timezone[]>([]); //store timezone from API
-const selectedTimeZone = ref('Europe/Paris'); //timezone selected by default
-const isLoadingTimezones = ref(false); //timezone loading status
-const now = ref(new Date()); //actual hour
 
 //define timezone interface
 interface Timezone {
-  value: string;
-  text: string;
-  countryCode: string;
+  label: string;
+  timezone: string;
+  flagUrl: string;
 }
 
-//function to toggle canadian dropdown menu state
+// using JWT store for authentification status
+const jwtStore = useJwtStore();
+// reactive reference for the current date and time
+const now = ref(new Date());
+// reference to the interval for updating the time
+let intervalId: number;
+
+// predefined list of timezones with their corresponding flags and labels
+const timezones: Timezone[] = [
+  { label: 'Canada', timezone: 'America/Toronto', flagUrl: "flag-canada.png" },
+  { label: 'USA Ouest', timezone: 'America/Los_Angeles', flagUrl: "flag-usa.png" },
+  { label: 'USA Centre', timezone: 'America/Chicago', flagUrl: "flag-usa.png" },
+  { label: 'United Kingdom', timezone: 'Europe/London', flagUrl: "flag-uk.png" },
+  { label: 'Russie', timezone: 'Europe/Moscow', flagUrl: "flag-russia.png" },
+  { label: 'Australie', timezone: 'Australia/Sydney', flagUrl: "flag-australia.png" },
+  { label: 'Guadeloupe', timezone: 'America/Guadeloupe', flagUrl: "flag-guadeloupe.png" },
+  { label: 'Martinique', timezone: 'America/Martinique', flagUrl: "flag-martinique.png" },
+  { label: 'Guyane', timezone: 'America/Cayenne', flagUrl: "flag-guyane.png" },
+  { label: 'La Réunion', timezone: 'Indian/Reunion', flagUrl: "flag-reunion.png" },
+];
+
+// reactive reference to the currently selected timezone, defaults to the first one
+const selectedTimeZone = ref<Timezone>(timezones[0]);
+// reactive boolean to control the dropdown menu's visibility
+const canadianDropdownOpen = ref(false);
+
+// function to select a timezone and update the flag and time
+const selectTimeZone = (timezone: Timezone) => {
+  selectedTimeZone.value = timezone; // this will change both the flag and the timezone
+  canadianDropdownOpen.value = false; // close the dropdown menu
+  now.value = new Date(); // update the current time
+};
+
+// function to convert flag URL path to a fully qualified URL
+const getFlagUrl = (path: string) => {
+  return new URL(`../assets/img/${path}`, import.meta.url).href;
+};
+
+// function to toggle the visibility of the dropdown menu
 const toggleCanadianDropdown = () => {
   canadianDropdownOpen.value = !canadianDropdownOpen.value;
-  console.log('toggleCanadianDropdown called, new value:', canadianDropdownOpen.value);
-  //load time zones only if the dropdown is open
-  if (canadianDropdownOpen.value) {
-    loadTimezones();
-  }
-  //force the DOM to update
-  nextTick(() => {
-    console.log('The DOM should now have updated');
-  });
 };
 
-//API key to access TimeZoneDB
-const timeZoneDBApiKey = 'LSINUF5SW6UO';
-
-//function to load timezones from API
-const loadTimezones = async () => {
-  isLoadingTimezones.value = true;
-  const timeZoneDBApiUrl = `http://api.timezonedb.com/v2.1/list-time-zone?key=${timeZoneDBApiKey}&format=json`;
-
-  try {
-    const response = await fetch(timeZoneDBApiUrl);
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error("Error fetching the time zones");
-    }
-
-    //updating timezone list with API data
-    timezones.value = data.zones.map((zone: { zoneName: string; countryName: string; countryCode: string }) => ({
-      value: zone.zoneName,
-      text: zone.countryName,
-      countryCode: zone.countryCode
-    })).sort((a: Timezone, b: Timezone) => a.text.localeCompare(b.text));
-
-  } catch (error) {
-    console.error("API error:", error);
-  } finally {
-    isLoadingTimezones.value = false;
-  }
-};
-
-//utility function to convert country code to flag emoji
-function countryCodeToFlagEmoji(countryCode: string): string {
-  const codePoints = countryCode.toUpperCase().split('').map(char => 127397 + char.charCodeAt(0));
-  return String.fromCodePoint(...codePoints);
-}
-
-//function to update the current time, will be called when a timezone is selected
+// Update to update the current time
 const updateDate = () => {
   now.value = new Date();
 };
 
-//calculated functions for displaying time based on selected timezones
-const canadianTime = computed(() => now.value.toLocaleTimeString("fr-FR", {
-  timeZone: 'America/Toronto',
-  hour: '2-digit',
-  minute: '2-digit',
-  second: '2-digit',
-  hour12: false
-}));
+// computed property to get the current time in the selected timezone
+const canadianTime = computed(() => {
+  return now.value.toLocaleTimeString("fr-FR", {
+    timeZone: selectedTimeZone.value.timezone,
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  });
+});
 
-const frenchTime = computed(() => now.value.toLocaleTimeString("fr-FR", {
-  timeZone: 'Europe/Paris',
-  hour: '2-digit',
-  minute: '2-digit',
-  second: '2-digit',
-  hour12: false
-}));
+// computed property to get the current time in france's timezone
+const frenchTime = computed(() => {
+  return now.value.toLocaleTimeString("fr-FR", {
+    timeZone: 'Europe/Paris',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  });
+});
 
 //initialization of the store for JWT management
-const jwtStore = useJwtStore();
+// const jwtStore = useJwtStore();
 
-let intervalId: number;
+// let intervalId: number;
 
-//hook executed after mounting the component
+// lifecycle hooks for creating and clearing the interval to update the time
 onMounted(() => {
-  updateDate(); //updates current time
-  intervalId = window.setInterval(updateDate, 1000); //updates the time every second
+  intervalId = window.setInterval(updateDate, 1000); // Use window.setInterval to make TypeScript happy
 });
 
-//hook executed before component unmount
 onUnmounted(() => {
-  window.clearInterval(intervalId); //stop updating time
+  clearInterval(intervalId); // Clear the interval
 });
+
+// const jwtStore = useJwtStore();
+
 </script>
+
 
 
 <style scoped>
@@ -197,6 +192,16 @@ img {
   gap: 10px;
 }
 
+.hidden-select {
+  display: none;
+}
+
+.flag-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .flag {
   height: 36px;
   width: 36px;
@@ -218,15 +223,23 @@ img {
   cursor: pointer;
 }
 
+.dropdown-indicator {
+  user-select: none;
+  margin-left: 5px;
+}
+
 .dropdown-menu {
   position: absolute;
-  top: 100%;
-  left: 0;
-  background-color: white;
+  top: calc(100% + 16px);
+  left: 13px;
+  /*background-color: white;*/
+  background-color: rgb(102, 101, 210);
   list-style: none;
   padding: 0;
   margin: 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  /*box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);*/
+  /*box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);*/
+  box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.13);
   z-index: 1000;
   max-height: 200px;
   overflow-y: auto;
@@ -241,7 +254,7 @@ img {
 }
 
 .dropdown-menu li:hover {
-  background-color: #f0f0f0;
+  background-color: #ffffff24;
 }
 
 .add-btn {
