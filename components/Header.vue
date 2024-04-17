@@ -28,7 +28,6 @@
       </client-only>
     </div>
 
-
     </p>
     <!--conditional connect/disconnect buttons-->
     <div class="btns" v-if="!jwtStore.jwt">
@@ -48,13 +47,26 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useJwtStore } from "~/stores/jwt";
+  //initializing reactive variables
+  const canadianDropdownOpen = ref(false); //canadian dropdown status
 
-//define timezone interface
-interface Timezone {
-  label: string;
-  timezone: string;
-  flagUrl: string;
-}
+  //viewer for dropdown menu state
+  watch(canadianDropdownOpen, (newVal) => {
+    console.log("Dropdown state changed:", newVal);
+  });
+
+  //initialize timezones with empty array
+  const timezones = ref<Timezone[]>([]); //store timezone from API
+  const selectedTimeZone = ref('Europe/Paris'); //timezone selected by default
+  const isLoadingTimezones = ref(false); //timezone loading status
+  const now = ref(new Date()); //actual hour
+
+  //define timezone interface
+  interface Timezone {
+    label: string;
+    timezone: string;
+    flagUrl: string;
+  }
 
 // using JWT store for authentification status
 const jwtStore = useJwtStore();
@@ -126,11 +138,6 @@ const frenchTime = computed(() => {
   });
 });
 
-//initialization of the store for JWT management
-// const jwtStore = useJwtStore();
-
-// let intervalId: number;
-
 // lifecycle hooks for creating and clearing the interval to update the time
 onMounted(() => {
   intervalId = window.setInterval(updateDate, 1000); // Use window.setInterval to make TypeScript happy
@@ -139,8 +146,6 @@ onMounted(() => {
 onUnmounted(() => {
   clearInterval(intervalId); // Clear the interval
 });
-
-// const jwtStore = useJwtStore();
 
 </script>
 
@@ -228,13 +233,10 @@ img {
   position: absolute;
   top: calc(100% + 16px);
   left: 13px;
-  /*background-color: white;*/
   background-color: rgb(102, 101, 210);
   list-style: none;
   padding: 0;
   margin: 0;
-  /*box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);*/
-  /*box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);*/
   box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.13);
   z-index: 1000;
   max-height: 200px;
