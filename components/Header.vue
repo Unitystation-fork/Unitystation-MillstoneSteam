@@ -49,8 +49,6 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useJwtStore } from "~/stores/jwt";
 
-
-
 //define timezone interface
 interface Timezone {
   label: string;
@@ -145,8 +143,6 @@ onUnmounted(() => {
 // const jwtStore = useJwtStore();
 
 </script>
-
-
 
 <style scoped>
 header {
