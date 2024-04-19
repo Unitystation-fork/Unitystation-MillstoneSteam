@@ -2,62 +2,62 @@ import { PrismaClient } from "@prisma/client";
 import jwt, { JwtPayload } from "jsonwebtoken";
 const prisma = new PrismaClient();
 
-const createTask = defineEventHandler(async (event) => {
-    // get the body of the request and asign its parameters to variables
-  const body = await readBody(event);
-  const title : string = body.title;
-  const content : string = body.content;
-  const isContentPrivate : boolean = body.isContentPrivate;
-  // get the token from the request headers
+const deleteUser = defineEventHandler(async (event) => {
+  const id = parseInt(event.context.params.id);
   const auth = event.req.headers.authorization;
   const token = (auth !== undefined) ?  auth.split(" ")[1] : null;
   try {
-    // verify the token and get the user id from it
-    if(!token) {
-        throw "No token provided";
+    //check if id is given
+    if (!id) {
+      throw "No id provided";
     }
-    const decoded :string | JwtPayload = jwt.verify(token, process.env.JWT_SECRET!);
-    if(!decoded || typeof decoded === "string") {
-        throw "Invalid token";
+    // verify the token and get the user id from it
+    if (!token) {
+      throw "No token provided";
+    }
+    const decoded: string | JwtPayload = jwt.verify(token, process.env.JWT_SECRET!);
+    if (!decoded || typeof decoded === "string") {
+      throw "Invalid token";
     }
     // check if the user exists and throw an error if it doesn't
     const user = await prisma.user.findUnique({
-        where: {
-            id: decoded.id,
-        }
+      where: {
+        id: decoded.id,
+      },
     });
-    if(!user) {
-        throw "User not found";
+    if (!user) {
+      throw "User not found";
     }
     //check if user is admin
-    if(user.role !== "ADMIN") {
-        throw "You do not have the permission to create tasks";
+    if (user.role !== "ADMIN") {
+      throw "You do not have the permission to delete users";
     }
-    // create the task
-    const task = await prisma.task.create({
-      data: {
-        title,
-        content,
-        isContentPrivate
+    // check if the user exists and throw an error if it doesn't
+    const userToDelete = await prisma.user.findUnique({
+      where: {
+        id: id,
+      },
+    });
+    if (!userToDelete) {
+      throw "User does not exist";
+    }
+    // delete the user
+    const deletedUser = await prisma.user.delete({
+      where: {
+        id: id,
       },
     });
     return {
       statusCode: 200,
-      body: {message: "Task created", task: task},
+      body: { message: "User deleted", user: deletedUser.name},
     };
-  } catch (e) {
-    console.log(e);
-    if(e.name ==="JsonWebTokenError"){
-      return { statusCode: 401, body: { error: "Invalid token" } };
-    }
-    if(e.name==="TokenExpiredError"){
-      return { statusCode: 401, body: { error: "Expired token" } };
-     }
+  } catch (error) {
+    console.log(error);
     return {
       statusCode: 500,
-      body: { error: "Task could not be edited", details: e },
+      body: { message: "User could not be deleted", error: error },
     };
   }
 });
 
-export default createTask;
+export default deleteUser;
