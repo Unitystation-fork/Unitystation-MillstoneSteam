@@ -67,7 +67,7 @@ const closeForm = () => {
 
 if (typeof window !== "undefined")
   window.onscroll = () => {
-    if (window.pageYOffset > 100) {
+    if (window.scrollY > 100) {
       showScrollToTop.value = true;
     } else {
       showScrollToTop.value = false;
@@ -101,7 +101,7 @@ html {
 }
 
 .presentation {
-  text-align: left;
+  text-align: justify;
   margin-top: 5rem;
   margin-bottom: 5rem;
   font-size: 1.2em;
