@@ -54,7 +54,7 @@ const jwtStore = useJwtStore();
 
 <style scoped>
 header {
-  height: 64px;
+  height: 8vw;
   background-color: #6665d2;
   display: flex;
   justify-content: space-around;
@@ -62,12 +62,12 @@ header {
   width: 100%;
 }
 .bienvenue{
-  font-size: 2vw;
+  font-size: 2.5vw;
 }
 button {
   background-color: transparent;
   border: none;
-  font-size: 1.3vw;
+  font-size: 1.5vw;
   font-weight: 600;
   cursor: pointer;
   color: white;
@@ -82,21 +82,21 @@ button:hover {
 }
 
 img {
-  height: 44px;
-  width: 44px;
+  height: 5vw;
+  width: 5vw;
   clip-path: circle(50%);
   vertical-align: middle;
 }
 
 .flag {
-  height: 2.8vw;
-  width: 2.8vw;
+  height: 4vw;
+  width: 4vw;
   vertical-align: middle;
   margin-left: 10px;
   margin-bottom: 6px;
 }
 .time{
-  font-size: 1.5vw;
+  font-size: 2vw;
 }
 .add-btn {
   font-size: 1em;

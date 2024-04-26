@@ -23,11 +23,8 @@
         <input type="checkbox" v-model="isContentPrivateInput" class="check" />
         <label for="isContentPrivateInput">Le contenu est-il privé ?</label>
       </div>
-      <input
-        class="inputStyle inputSubmit"
-        type="submit"
-        value="Modifier la tâche"
-      />
+      <button class="inputStyle inputSubmit"
+        type="submit"  @click="endTaskEdit">Modifier la tâche</button>
     </form>
     <span class="error" v-if="error !== ''">{{ error }}</span>
   </div>
@@ -37,12 +34,13 @@
 import { useJwtStore } from "~~/stores/jwt";
 import { useTaskStore } from "~~/stores/task";
 
-const { id, title, content, completed, isContentPrivate } = defineProps({
+const { id, title, content, completed, isContentPrivate, isSelected} = defineProps({
   id: Number,
   title: String,
   content: String,
   completed: Boolean,
   isContentPrivate: Boolean,
+  isSelected: Boolean
 });
 
 const taskStore = useTaskStore();
@@ -71,6 +69,21 @@ const updateTask = async () => {
     return;
   }
   emit("close");
+};
+const endTaskEdit = () => {
+  updateTask();
+  taskStore.tasks.sort((a, b) => {
+    if (a.completed < b.completed) {
+      return 1;
+    }
+    if (a.completed > b.completed) {
+      return -1;
+    }
+    return 0;
+  });
+  for (let currentTask of taskStore.tasks){
+      currentTask.isSelected = false
+  }
 };
 </script>
 
