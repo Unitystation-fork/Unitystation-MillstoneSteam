@@ -1,14 +1,12 @@
-import { defineStore, storeToRefs } from "pinia";
+import { defineStore } from 'pinia';
 
-export const useJwtStore = defineStore("jwt", {
+export const useJwtStore = defineStore('jwt', {
   state: () => ({
-    jwt: storeToRefs(null),
-    role: storeToRefs(""),
+    jwt: null,
+    role: '',
   }),
   getters: {
-    getJwt(state) {
-      return state.token;
-    },
+    getJwt: (state) => state.jwt,
   },
   actions: {
     setJwt(jwt) {
@@ -17,11 +15,9 @@ export const useJwtStore = defineStore("jwt", {
     setRole(role) {
       this.role = role;
     },
-    logout(){  
+    logout() {
       this.jwt = null;
-      this.role = "";
-    }
-  
+      this.role = '';
+    },
   },
-  persist: true,
 });
