@@ -45,21 +45,9 @@
 
 <!-- script UX and timezone API -->
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
-import { useJwtStore } from '@/stores/jwt'; // Ensure the path is correct
-import { defineComponent } from 'vue';
-
-defineComponent({
-  name: 'HeaderComponent'
-});
-
-const jwtStore = useJwtStore();
-const { jwt, logout } = storeToRefs(jwtStore);
-
-// reactive states
-const canadianDropdownOpen = ref(false);
-const now = ref(new Date());
-let intervalId: number;
+import { ref, onMounted, onUnmounted, computed } from 'vue';
+import { useJwtStore } from '@/stores/jwt';
+import { defineStore, storeToRefs } from 'pinia';
 
 // Define your Timezone type if not already globally available
 interface Timezone {
@@ -68,37 +56,61 @@ interface Timezone {
   flagUrl: string;
 }
 
-// Reactive properties for timezone selection
-const timezones = ref<Timezone[]>([ /* your timezones */ ]);
-const selectedTimeZone = ref<Timezone>(timezones.value[0]);
+const jwtStore = useJwtStore();
+const { jwt, logout } = storeToRefs(jwtStore);
 
-// Methods
-function selectTimeZone(timezone: Timezone) {
-  selectedTimeZone.value = timezone;
-  canadianDropdownOpen.value = false;
-}
+// reactive states
+const canadianDropdownOpen = ref(false);
+const now = ref(new Date());
+
+// predefined list of timezones with their corresponding flags and labels
+const timezones: Timezone[] = [
+  { label: 'Canada', timezone: 'America/Toronto', flagUrl: "flag-canada.png" },
+  { label: 'USA Ouest', timezone: 'America/Los_Angeles', flagUrl: "flag-usa.png" },
+  { label: 'USA Centre', timezone: 'America/Chicago', flagUrl: "flag-usa.png" },
+  { label: 'United Kingdom', timezone: 'Europe/London', flagUrl: "flag-uk.png" },
+  { label: 'Russie', timezone: 'Europe/Moscow', flagUrl: "flag-russia.png" },
+  { label: 'Australie', timezone: 'Australia/Sydney', flagUrl: "flag-australia.png" },
+  { label: 'Guadeloupe', timezone: 'America/Guadeloupe', flagUrl: "flag-guadeloupe.png" },
+  { label: 'Martinique', timezone: 'America/Martinique', flagUrl: "flag-martinique.png" },
+  { label: 'Guyane', timezone: 'America/Cayenne', flagUrl: "flag-guyane.png" },
+  { label: 'La Réunion', timezone: 'Indian/Reunion', flagUrl: "flag-reunion.png" },
+];
+
+const selectedTimeZone = ref<Timezone>(timezones[0]);
+
+let intervalId: number;
+
+// function to select a timezone and update the flag and time
+const selectTimeZone = (timezone: Timezone) => {
+  selectedTimeZone.value = timezone; // this will change both the flag and the timezone
+  canadianDropdownOpen.value = false; // close the dropdown menu
+};
 
 function toggleCanadianDropdown() {
   canadianDropdownOpen.value = !canadianDropdownOpen.value;
 }
 
-function getFlagUrl(path: string) {
+function getFlagUrl(path: string): string {
   return new URL(`../assets/img/${path}`, import.meta.url).href;
 }
 
-// Computed properties for time display
-const canadianTime = computed(() => now.value.toLocaleTimeString('en-CA', { timeZone: selectedTimeZone.value.timezone, hour12: false }));
-const frenchTime = computed(() => now.value.toLocaleTimeString('fr-FR', { timeZone: 'Europe/Paris', hour12: false }));
+const canadianTime = computed(() => {
+  return now.value.toLocaleTimeString('en-CA', { timeZone: selectedTimeZone.value.timezone, hour12: false });
+});
 
-// Lifecycle hooks
+const frenchTime = computed(() => {
+  return now.value.toLocaleTimeString('fr-FR', { timeZone: 'Europe/Paris', hour12: false });
+});
+
 onMounted(() => {
-  intervalId = setInterval(() => {
+  intervalId = window.setInterval(() => {
     now.value = new Date();
-  }, 1000);
+  }, 1000) as unknown as number;
 });
 
 onUnmounted(() => {
-  clearInterval(intervalId);
+  window.clearInterval(intervalId);
 });
 
 // Refs for UI control
