@@ -1,7 +1,7 @@
 <template>
   <footer class="footerStyle">
     <div class="container">
-      <div>
+      <div class="news">
         <h2>Nos actualités</h2>
         <a
           href="https://github.com/Unitystation-fork/Unitystation-MillstoneSteam"
@@ -17,7 +17,7 @@
         >
       </div>
       <div>
-        <h2>Nos réseaux sociaux</h2>
+        <h2>Nos réseaux sociaux</h2><br>
         <section class="links">
           <a href="https://t.co/Xv1P9jdJLR"
             ><img
@@ -28,7 +28,6 @@
             ><img
               class="twitter"
               src="~/assets/img/twitterlogo.png"
-              alt="Notre Twitter"
           /></a>
           <a href="https://www.facebook.com/union.rolistes/"
             ><img src="~/assets/img/facebook-logo-3-1.png" alt="Notre facebook"
@@ -36,7 +35,7 @@
         </section>
       </div>
       <div>
-        <h2>Nous contacter</h2>
+        <h2>Nous contacter</h2><br>
         <a
           href="mailto:contact.unionrolistes@gmail.com
 "
@@ -52,17 +51,18 @@
 
 <style scoped>
 .footerStyle {
-  min-height: 10em;
-  background-color: #8c9cff;
+  /* min-height: 10em; */
+  background-color:#6665d2; /*#8c9cff*/
   margin-top: 25px;
   width: 100%;
 }
 
 img {
-  width: 3em;
-  height: 3em;
+  width: 2.5em;
+  height: 2.5em;
   margin: 0 0.5em;
   filter: invert(100%);
+  border-radius: 50%;
 }
 
 a {
@@ -92,11 +92,18 @@ span {
   justify-content: space-evenly;
   flex-wrap: wrap;
 }
-
+.news{
+  width : 40%;
+}
+div{
+  width: 30%;
+  font-size: 1.4vw;
+  text-align: center;
+}
 .links {
   display: flex;
   flex-direction: row;
-  justify-content: space-evenly;
+  justify-content: center;
   align-items: center;
 }
 </style>

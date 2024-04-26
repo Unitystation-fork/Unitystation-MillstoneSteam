@@ -5,9 +5,6 @@
     </h2>
     <div class="error" v-if="error !== ''">{{ error }}</div>
     <div class="list" v-if="error === ''">
-      <button v-if="isModifShown" @click="isModifShown = false">
-        Terminer les modifications
-      </button>
       <div class="tasks" v-for="task in taskStore.tasks" :key="task.id">
         <div class="task-title" :id="task.id">
           <h2>
@@ -38,13 +35,13 @@
         </div>
         <ModifTask
           v-bind="task"
-          v-if="jwtStore.role === 'ADMIN' && isModifShown"
+          v-if="jwtStore.role === 'ADMIN'  && task.isSelected"
           class="modif-form"
         />
-      </div>
-      <button v-if="isModifShown" @click="endTaskEdit">
+        <!-- <button v-if="task.isSelected" @click="endTaskEdit, task.isSelected = false">
         Terminer les modifications
-      </button>
+      </button> -->
+      </div>
     </div>
   </div>
 </template>
@@ -58,7 +55,6 @@ const tasks = taskStore.tasks.value
   ? taskStore.tasks.value
   : await taskStore.setTasks();
 const jwtStore = useJwtStore();
-const isModifShown = ref(false);
 const error = ref("");
 
 const md = new MarkdownIt();
@@ -73,15 +69,20 @@ const endTaskEdit = () => {
     }
     return 0;
   });
-  isModifShown.value = false;
 };
 
 const scrollToTask = (id) => {
-  isModifShown.value = true;
   const task = document.getElementById(id);
   setTimeout(() => {
     task.scrollIntoView({ behavior: "smooth" });
   }, 10);
+  for (let currentTask of taskStore.tasks){
+    if (currentTask.id != id){
+      currentTask.isSelected = false
+    } else {
+      currentTask.isSelected = true
+    }
+  } 
 };
 
 if (!tasks) {
