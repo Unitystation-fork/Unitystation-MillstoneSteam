@@ -1,0 +1,3 @@
+milestone.unionrolistes.fr localhost 127.0.0.1 {
+    reverse_proxy app:3000
+}
