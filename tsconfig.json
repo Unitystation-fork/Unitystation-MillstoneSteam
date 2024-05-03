@@ -5,10 +5,10 @@
     "baseUrl": ".",
     "typeRoots": ["./node_modules/@types", "./types"],
     "types": ["vue"],
-  "paths": {
-    "@/*": ["src/*"],
-    "~/*": ["src/*"],
-    "@/stores/*": ["./stores"],
-  }
+    "paths": {
+      "@/*": ["src/*"],
+      "~/*": ["src/*"],
+      "@/stores/*": ["stores/*"]
+    }    
   }
 }

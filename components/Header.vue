@@ -38,7 +38,7 @@
 
     <div class="btns">
       <button v-if="!jwtStore.jwt" @click="$emit('login')">Login</button>
-      <button v-if="jwtStore.jwt" @click="jwtStore.logout()">Logout</button>
+      <button v-if="jwtStore.jwt" @click="performLogout">Logout</button>
     </div>
   </header>
 </template>
@@ -57,7 +57,7 @@ interface Timezone {
 }
 
 const jwtStore = useJwtStore();
-const { jwt, logout } = storeToRefs(jwtStore);
+const { jwt } = storeToRefs(jwtStore);
 
 // reactive states
 const canadianDropdownOpen = ref(false);
@@ -120,8 +120,9 @@ function hideCreateButton() {
   isCreateButtonVisible.value = false;
 }
 
+// Use jwtStore.logout() directly
 function performLogout() {
-  logout();
+  jwtStore.logout();
 }
 </script>
 
