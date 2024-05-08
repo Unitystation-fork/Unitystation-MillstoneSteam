@@ -9,3 +9,8 @@ node_modules
 .env
 dist
 milestone.db
+*.sql
+
+*.toml
+
+*.db
