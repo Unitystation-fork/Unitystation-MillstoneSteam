@@ -76,10 +76,11 @@ Pour accéder à l'aperçu de la version de production, visitez http://milestone
 Voici les étapes à suivre pour se connecter en tant qu'administrateur :
 
 
-1. Copier le fichier `.default` en `.env` avec la commande `cp .default .env` puis le remplir avec un nom d'utilisateur et un mot de passe admin.
+1. Renommer le fichier `.default` en `.env` avec la commande `cp .default .env` puis le remplir avec un nom d'utilisateur et un mot de passe admin et vous avez la possibilite de laisser URL de base comme elle est ou la changer mais absolument l'indiquer.
+URL de Base du serveur par defaut est : http://localhost:3000/api
 
 
-2.  `node prisma/seed.js` pour injecter les données dans la base de données.
+2. Executer la commande `node prisma/seed.js` pour injecter les données dans la base de données.
 
   
 3. Exécuter la commande `npx prisma generate` pour générer cet utilisateur avec le rôle admin.
