@@ -8,7 +8,7 @@ export const useTaskStore = defineStore("tasks", {
   actions: {
     async setTasks() {
       const res = await fetch(
-        "http://localhost:3000/api/task",
+        `${import.meta.env.VITE_APP_API_URL}/task`,
         {
           method: "GET",
         }
@@ -38,7 +38,7 @@ export const useTaskStore = defineStore("tasks", {
     async addTask(jwt, title, content, completed) {
       console.log("addTask", title, content, completed, jwt);
       const res = await fetch(
-        "http://localhost:3000/api/task",
+        `${import.meta.env.VITE_APP_API_URL}/task`,
         {
           method: "POST",
           headers: {
@@ -73,7 +73,7 @@ export const useTaskStore = defineStore("tasks", {
 
     async updateTask(jwt, id, title, content, completed, isContentPrivate) {
       const res = await fetch(
-        "http://localhost:3000/api/task/" + id,
+        `${import.meta.env.VITE_APP_API_URL}/task/${id}` ,
         {
           method: "PUT",
           headers: {
@@ -118,7 +118,7 @@ export const useTaskStore = defineStore("tasks", {
         return;
       }
       const res = await fetch(
-        "http://localhost:3000/api/task/" + id,
+        `${import.meta.env.VITE_APP_API_URL}/task/${id}`,
         {
           //await fait attendre que toute la fonction soit déroulée
           headers: {

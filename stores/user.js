@@ -7,7 +7,7 @@ export const useUserStore = defineStore("users", {
   }),
   actions: {
     async setUsers(jwt) {
-      const res = await fetch("http://localhost:3000/api/user", {
+      const res = await fetch(`${import.meta.env.VITE_APP_API_URL}/user`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -33,7 +33,7 @@ export const useUserStore = defineStore("users", {
     },
 
     async addUser(jwt, name, role, password, discordId, twitchId) {
-      const res = await fetch("http://localhost:3000/api/user", {
+      const res = await fetch(`${import.meta.env.VITE_APP_API_URL}/user`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -74,7 +74,7 @@ export const useUserStore = defineStore("users", {
       if (!conf) {
         return;
       }
-      const res = await fetch(`http://localhost:3000/api/user/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_APP_API_URL}/user/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -104,7 +104,7 @@ export const useUserStore = defineStore("users", {
     },
 
     async updateUser(jwt, id, name, role, password, discordId, twitchId) {
-      const res = await fetch(`http://localhost:3000/api/user/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_APP_API_URL}/user/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -144,7 +144,7 @@ export const useUserStore = defineStore("users", {
     async checkThirdPartyUserExistence(userId) {
       try {
         const res = await fetch(
-          `http://localhost:3000/api/third-party/${userId}`
+          `${import.meta.env.VITE_APP_API_URL}`/third-party/`${userId}`
         );
 
         const data = await res.json();
