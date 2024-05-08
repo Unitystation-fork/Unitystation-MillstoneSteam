@@ -18,7 +18,7 @@
       <input class="inputStyle" type="password" v-model="passwordInput" />
     </div>
     <input class="inputStyle inputSubmit" type="submit" value="Modifier" />
-    <button @click="$emit('close')">Arrêter les modifications</button>
+    <button @click="$emit('close'), endUserEdit()">Arrêter les modifications</button>
     <span v-if="error !== ''">{{ error }}</span>
   </form>
 </template>
@@ -31,11 +31,12 @@ const jwt = jwtStore.jwt;
 const userStore = useUserStore();
 const emit = defineEmits(["close", "errorOnUpdateUser"]);
 
-const { id, name, role, password } = defineProps({
+const { id, name, role, password, isSelected } = defineProps({
   id: Number,
   name: String,
   role: String,
   password: String,
+  isSelected: Boolean
 });
 
 const nameInput = ref(name);
@@ -55,6 +56,11 @@ const editUser = async () => {
     emit("errorOnUpdateUser");
   }
   await userStore.setUsers(jwt);
+};
+const endUserEdit = () => {
+  for (let currentUser of userStore.users){
+      currentUser.isSelected = false
+  }
 };
 </script>
 
