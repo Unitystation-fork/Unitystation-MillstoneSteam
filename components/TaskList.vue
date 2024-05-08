@@ -38,9 +38,6 @@
           v-if="jwtStore.role === 'ADMIN'  && task.isSelected"
           class="modif-form"
         />
-        <!-- <button v-if="task.isSelected" @click="endTaskEdit, task.isSelected = false">
-        Terminer les modifications
-      </button> -->
       </div>
     </div>
   </div>
@@ -59,17 +56,17 @@ const error = ref("");
 
 const md = new MarkdownIt();
 
-const endTaskEdit = () => {
-  taskStore.tasks.sort((a, b) => {
-    if (a.completed < b.completed) {
-      return 1;
-    }
-    if (a.completed > b.completed) {
-      return -1;
-    }
-    return 0;
-  });
-};
+// const endTaskEdit = () => {
+//   taskStore.tasks.sort((a, b) => {
+//     if (a.completed < b.completed) {
+//       return 1;
+//     }
+//     if (a.completed > b.completed) {
+//       return -1;
+//     }
+//     return 0;
+//   });
+// };
 
 const scrollToTask = (id) => {
   const task = document.getElementById(id);
