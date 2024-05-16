@@ -1,69 +1,78 @@
 <template>
   <header>
+    <!-- Image of the Twitch logo, representing the brand or project. -->
     <img src="@/assets/img/305474881_500277108772915_4425958856109240367_n.jpg" alt="twitch" />
+    <!-- Main heading welcoming users to the project. -->
     <h1>Bienvenue sur le projet milestone !</h1>
 
-    <!--container for flags + time display-->
+    <!-- Container for displaying flags and times corresponding to different timezones. -->
     <p class="flag-container">
+      <!-- Static image showing the French flag. -->
       <img class="flag" src="~/assets/img/flag-france.png" alt="french-flag" />
-      <!-- display time in france's timezone -->
+      <!-- Displays time in France's timezone, updated dynamically. -->
       {{ frenchTime }}
 
-      <!-- container for canadian flag + the dropdown menu -->
-    <div class="dropdown" @click="toggleCanadianDropdown">
-      <!-- dynamic image for displaying the selected flag -->
-      <img class="flag" :src="getFlagUrl(selectedTimeZone.flagUrl)" :alt="selectedTimeZone.label" />
-      <span class="dropdown-indicator">&#9660;</span>
-      <!-- display time in the selected timezone -->
-      {{ canadianTime }}
+      <!-- Dropdown menu for selecting and displaying Canadian timezones and flags. -->
+      <div class="dropdown" @click="toggleCanadianDropdown">
+        <!-- Dynamic image sourced from a computed method, showing the selected flag. -->
+        <img class="flag" :src="getFlagUrl(selectedTimeZone.flagUrl)" :alt="selectedTimeZone.label" />
+        <span class="dropdown-indicator">&#9660;</span>
+        <!-- Displays time in the selected Canadian timezone. -->
+        {{ canadianTime }}
 
-      <!-- dropdown menu will appear when the flag is clicked -->
-      <client-only>
-        <ul v-show="canadianDropdownOpen" class="dropdown-menu">
-          <!-- loop over timezones for user to select -->
-          <li v-for="timezone in timezones" :key="timezone.label" @click="selectTimeZone(timezone)">
-            {{ timezone.label }}
-          </li>
-        </ul>
-      </client-only>
-    </div>
-
+        <!-- Client-only encapsulation to ensure this part is rendered client-side. -->
+        <client-only>
+          <!-- Dropdown menu showing when the flag is clicked, allows timezone selection. -->
+          <ul v-show="canadianDropdownOpen" class="dropdown-menu">
+            <!-- Iterates over a list of timezones, creating a list item for each. -->
+            <li v-for="timezone in timezones" :key="timezone.label" @click="selectTimeZone(timezone)">
+              {{ timezone.label }}
+            </li>
+          </ul>
+        </client-only>
+      </div>
     </p>
-    <!--conditional connect/disconnect buttons-->
+
+    <!-- Buttons for user account actions, shown based on conditional logic. -->
     <div class="btns" v-if="isCreateButtonVisible">
+      <!-- Link to account creation, opens in a new tab. -->
       <a href="https://vu.fr/mGJw" target="_blank">
         <button @click="hideCreateButton">Create account</button>
       </a>
     </div>
 
+    <!-- Login and logout buttons displayed based on user authentication status. -->
     <div class="btns">
+      <!-- Shows login button if the user is not authenticated. -->
       <button v-if="!jwtStore.jwt" @click="$emit('login')">Login</button>
+      <!-- Shows logout button if the user is authenticated. -->
       <button v-if="jwtStore.jwt" @click="performLogout">Logout</button>
     </div>
   </header>
 </template>
 
-<!-- script UX and timezone API -->
+<!-- script UX and timezone -->
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useJwtStore } from '@/stores/jwt';
 import { defineStore, storeToRefs } from 'pinia';
 
-// Define your Timezone type if not already globally available
+// Interface defining the structure for a timezone object.
 interface Timezone {
   label: string;
   timezone: string;
   flagUrl: string;
 }
 
+// Setup for JWT-based authentication store.
 const jwtStore = useJwtStore();
 const { jwt } = storeToRefs(jwtStore);
 
-// reactive states
+// Reactive state declarations.
 const canadianDropdownOpen = ref(false);
 const now = ref(new Date());
 
-// predefined list of timezones with their corresponding flags and labels
+// Predefined list of timezones, each with a label, timezone string, and flag URL.
 const timezones: Timezone[] = [
   { label: 'Canada', timezone: 'America/Toronto', flagUrl: "flag-canada.png" },
   { label: 'USA Ouest', timezone: 'America/Los_Angeles', flagUrl: "flag-usa.png" },
@@ -77,8 +86,10 @@ const timezones: Timezone[] = [
   { label: 'La Réunion', timezone: 'Indian/Reunion', flagUrl: "flag-reunion.png" },
 ];
 
+// Reactive reference to the currently selected timezone, defaulting to the first in the list.
 const selectedTimeZone = ref<Timezone>(timezones[0]);
 
+// Interval identifier for time updates.
 let intervalId: number;
 
 // function to select a timezone and update the flag and time
@@ -87,40 +98,37 @@ const selectTimeZone = (timezone: Timezone) => {
   canadianDropdownOpen.value = false; // close the dropdown menu
 };
 
+// Toggles the visibility of the dropdown menu.
 function toggleCanadianDropdown() {
   canadianDropdownOpen.value = !canadianDropdownOpen.value;
 }
 
+// Returns the full URL for a given flag image path.
 function getFlagUrl(path: string): string {
   return new URL(`../assets/img/${path}`, import.meta.url).href;
 }
 
-const canadianTime = computed(() => {
-  return now.value.toLocaleTimeString('en-CA', { timeZone: selectedTimeZone.value.timezone, hour12: false });
-});
+// Computed properties for displaying times in specific timezones.
+const canadianTime = computed(() => now.value.toLocaleTimeString('en-CA', { timeZone: selectedTimeZone.value.timezone, hour12: false }));
+const frenchTime = computed(() => now.value.toLocaleTimeString('fr-FR', { timeZone: 'Europe/Paris', hour12: false }));
 
-const frenchTime = computed(() => {
-  return now.value.toLocaleTimeString('fr-FR', { timeZone: 'Europe/Paris', hour12: false });
-});
-
+// Lifecycle hooks to set up and tear down a timer that updates the current time.
 onMounted(() => {
   intervalId = window.setInterval(() => {
     now.value = new Date();
-  }, 1000) as unknown as number;
+  }, 1000);
 });
-
 onUnmounted(() => {
   window.clearInterval(intervalId);
 });
 
-// Refs for UI control
+// UI control reference to manage the visibility of the create account button.
 const isCreateButtonVisible = ref(true);
-
 function hideCreateButton() {
   isCreateButtonVisible.value = false;
 }
 
-// Use jwtStore.logout() directly
+// Direct usage of the jwtStore to handle user logout.
 function performLogout() {
   jwtStore.logout();
 }
