@@ -1,11 +1,11 @@
-FROM node:19-alpine3.16
+FROM node:22-bookworm-slim
 
 # Create app directory
 RUN mkdir -p /app
 WORKDIR /app
 
 #Install app dependencies
-RUN apk update && apk upgrade 
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends openssl && rm -rf /var/lib/apt/lists/*
     
 #Set environment variables
 
