@@ -45,6 +45,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
+      apiBase: process.env.API_BASE || "http://localhost:3000",
       discordClientId: process.env.DISCORD_CLIENT_ID,
       discordClientSecret: process.env.DISCORD_CLIENT_SECRET,
       discordClientRedirect: process.env.DISCORD_CLIENT_REDIRECT,

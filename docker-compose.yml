@@ -1,11 +1,10 @@
-version: '3.8'
-
-
 services:
-  app: 
+  app:
     build: .
     env_file:
       - .env
+    environment:
+      - API_BASE=https://milestone.unionrolistes.fr
     image: app
     container_name: app
     ports:

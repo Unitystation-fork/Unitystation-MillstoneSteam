@@ -7,7 +7,7 @@ export const useDiscordStore = defineStore("discord", {
     }),
     actions: {
         async fetchDiscordUser(jwt) {
-            const res = await fetch("http://localhost:3000/api/discord-id", {
+            const res = await fetch(apiUrl("/api/discord-id"), {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
