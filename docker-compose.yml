@@ -5,7 +5,6 @@ services:
       - .env
     environment:
       - NUXT_PUBLIC_API_BASE=https://milestone.unionrolistes.fr
-    image: app
     container_name: app
     restart: always
     networks:
