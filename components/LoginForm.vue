@@ -63,9 +63,11 @@
 import { useJwtStore } from "~~/stores/jwt";
 import { useUserStore } from "~~/stores/user"; // Update the import path as needed
 import { useDiscordStore } from "~~/stores/discord";
+import { useTaskStore } from "~~/stores/task";
 import { onMounted } from "vue";
 
 const userStore = useUserStore();
+const taskStore = useTaskStore();
 const username = ref("");
 const password = ref("");
 const error = ref("");
@@ -145,10 +147,14 @@ const login = async (isAdmin = true) => {
   if (res.statusCode === 200) {
     jwtStore.setJwt(res.body.token);
     jwtStore.setRole(res.body.role);
+    // the private contents are only sent once the user is logged in
+    await taskStore.setTasks();
     //redirect to home page from discord callback address
     alert("Votre connexion est réussie");
     await navigateTo("/");
     emit("close");
+  } else if (res) {
+    error.value = res.statusMessage;
   }
 };
 

@@ -151,6 +151,19 @@ git pull
 docker up
 ```
 
+### Migrations en production
+
+L'image finale ne contient pas Prisma, et la commande `prisma migrate deploy` du Dockerfile ne touche qu'une copie de la base, recouverte au démarrage par `prisma/milestone.db`. Une version qui ajoute une migration doit donc être appliquée à la vraie base :
+
+```bash
+
+cd /usr/local/src/Unitystation-MillstoneSteam/
+docker compose stop app
+cp -a prisma/milestone.db prisma/milestone.db.avant-migration
+docker compose --profile migrate run --build --rm migrate
+docker compose up -d --build app
+```
+
 ### Utilisation
 
 #### Crédit, Participants, Organisation

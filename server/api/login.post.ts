@@ -8,28 +8,24 @@ const login = defineEventHandler(async (event) => {
 
   const { name, password } = body;
 
+  // Même réponse pour un nom inconnu ou un mot de passe faux. Un compte sans
+  // mot de passe (Discord, Twitch) ne peut pas se connecter par cette route.
+  const invalidCredentials = {
+    statusCode: 401,
+    statusMessage: "Identifiants incorrects.",
+  };
+
+  if (typeof name !== "string" || typeof password !== "string") {
+    throw createError(invalidCredentials);
+  }
+
   const user = await prisma.user.findUnique({
     where: { name: name },
     select: { id: true, password: true, role: true },
   });
 
-  if (!user) {
-    throw {
-      statusCode: 401,
-      statusMessage: "Utilisateur inconnu.",
-    };
-  }
-  // Discord user login without password
-
-  if (password) {
-    const isPasswordCorrect =  bcrypt.compare(password, user.password!);
-    
-    if (!isPasswordCorrect) {
-      throw {
-        statusCode: 401,
-        statusMessage: "Mot de passe incorrect.",
-      };
-    }
+  if (!user?.password || !(await bcrypt.compare(password, user.password))) {
+    throw createError(invalidCredentials);
   }
 
   const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET!, {
