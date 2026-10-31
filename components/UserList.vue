@@ -35,8 +35,9 @@
             </span>
             <ModifUser
               v-bind="user"
-              v-if="showModifUserForm"
-              @close="showModifUserForm = false"
+              v-if="showModifUserForm && user.isSelected"
+              @close="showModifUserForm=false"
+              @submit="showModifUserForm=false"
               @errorOnUpdateUser="
                 error = `La modification de l'utilisateur ${user.name} a échoué.`
               "
@@ -68,11 +69,19 @@ const error = ref("");
 
 const scrollToUser = (id) => {
   showModifUserForm.value = !showModifUserForm.value;
+  
+  const newId = id.substring(4)
   const user = document.getElementById(id);
-  console.log(user);
   setTimeout(() => {
     user.scrollIntoView({ behavior: "smooth" });
   }, 10);
+  for (let currentUser of userStore.users){
+    if (currentUser.id != newId){
+      currentUser.isSelected = false
+    } else {
+      currentUser.isSelected = true
+    }
+  } 
 };
 
 if (users === false) {
