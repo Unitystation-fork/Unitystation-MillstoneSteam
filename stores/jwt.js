@@ -1,9 +1,9 @@
-import { defineStore, storeToRefs } from "pinia";
+import { defineStore } from "pinia";
 
 export const useJwtStore = defineStore("jwt", {
   state: () => ({
-    jwt: storeToRefs(null),
-    role: storeToRefs(""),
+    jwt: null,
+    role: "",
   }),
   getters: {
     getJwt(state) {

@@ -19,6 +19,17 @@ services:
     volumes:
       - ./prisma/milestone.db:/app/.output/server/prisma/milestone.db
 
+  # Applique les migrations à la vraie base : voir « Migrations en production » du README.
+  migrate:
+    build:
+      context: .
+      target: build
+    profiles:
+      - migrate
+    command: npx prisma migrate deploy
+    volumes:
+      - ./prisma/milestone.db:/app/prisma/milestone.db
+
 networks:
   traefik-public:
     external: true

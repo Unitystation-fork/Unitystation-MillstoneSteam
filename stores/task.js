@@ -1,4 +1,5 @@
 import { defineStore, storeToRefs } from "pinia";
+import { useJwtStore } from "~/stores/jwt";
 
 export const useTaskStore = defineStore("tasks", {
   state: () => ({
@@ -7,10 +8,12 @@ export const useTaskStore = defineStore("tasks", {
 
   actions: {
     async setTasks() {
+      const jwt = useJwtStore().jwt;
       const res = await fetch(
         apiUrl("/api/task"),
         {
           method: "GET",
+          headers: jwt ? { Authorization: "Bearer " + jwt } : {},
         }
       )
         .then((r) => r.json())
@@ -148,5 +151,4 @@ export const useTaskStore = defineStore("tasks", {
       return "ok";
     },
   },
-  persist: true,
 });
