@@ -22,7 +22,7 @@ Le projet fonctionne avec le framework fullstack [Nuxt.js](https://v3.nuxtjs.org
 
 ### Dépendances
 
-Avant de cloner le projet, assurez-vous d'avoir installé [Node.js](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) avec une version minimale de 18.
+Avant de cloner le projet, assurez-vous d'avoir installé [Node.js](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) avec une version minimale de 22.22.3 (exigence de Nuxt 4).
 
 Pour installer les dépendances, utilisez l'une des commandes suivantes :
 
