@@ -28,31 +28,25 @@ export default defineNuxtConfig({
       },
     ],
   ],
-  auth: {
-    strategies: {
-      discord: {
-        scheme: "oauth2",
-        endpoints: {
-          authorization: "https://discord.com/api/oauth2/authorize",
-          token: "https://discord.com/api/oauth2/token",
-          userInfo: "https://discord.com/api/users/@me",
-        },
-        responseType: "token",
-        redirectUri: process.env.DISCORD_CLIENT_REDIRECT, // Utilisez la valeur appropriée
-        clientId: process.env.DISCORD_CLIENT_ID, // Utilisez la valeur appropriée
-      },
-    },
-  },
   runtimeConfig: {
+    // Secrets : privés au serveur, jamais envoyés au navigateur.
+    // Surchargés au runtime par NUXT_DISCORD_CLIENT_SECRET / NUXT_TWITCH_CLIENT_SECRET.
+    discordClientSecret: "",
+    twitchClientSecret: "",
+    // Adresses des API OAuth, surchargeables pour les tests (NUXT_OAUTH_*).
+    oauth: {
+      discordApiBase: "https://discord.com/api",
+      twitchIdBase: "https://id.twitch.tv",
+      twitchApiBase: "https://api.twitch.tv",
+    },
     public: {
       // surchargeable au runtime (sans rebuild) via NUXT_PUBLIC_API_BASE
       apiBase: "http://localhost:3000",
-      discordClientId: process.env.DISCORD_CLIENT_ID,
-      discordClientSecret: process.env.DISCORD_CLIENT_SECRET,
-      discordClientRedirect: process.env.DISCORD_CLIENT_REDIRECT,
-      twitchClientId: process.env.TWITCH_CLIENT_ID,
-      twitchClientSecret: process.env.TWTICH_CLIENT_SECRET,
-      twitchClientRedirect: process.env.TWITCH_CLIENT_REDIRECT,
+      // NUXT_PUBLIC_DISCORD_CLIENT_ID, NUXT_PUBLIC_DISCORD_CLIENT_REDIRECT, etc.
+      discordClientId: "",
+      discordClientRedirect: "",
+      twitchClientId: "",
+      twitchClientRedirect: "",
     },
   },
 });

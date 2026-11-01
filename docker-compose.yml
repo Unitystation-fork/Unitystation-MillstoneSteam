@@ -5,6 +5,14 @@ services:
       - .env
     environment:
       - NUXT_PUBLIC_API_BASE=https://milestone.unionrolistes.fr
+      # Les variables du .env (noms ci-dessous) sont recopiées vers les NUXT_*
+      # que lit le serveur Nuxt au runtime (le .env n'est pas lu par le serveur construit).
+      - NUXT_PUBLIC_DISCORD_CLIENT_ID=${DISCORD_CLIENT_ID:-}
+      - NUXT_DISCORD_CLIENT_SECRET=${DISCORD_CLIENT_SECRET:-}
+      - NUXT_PUBLIC_DISCORD_CLIENT_REDIRECT=${DISCORD_CLIENT_REDIRECT:-}
+      - NUXT_PUBLIC_TWITCH_CLIENT_ID=${TWITCH_CLIENT_ID:-}
+      - NUXT_TWITCH_CLIENT_SECRET=${TWITCH_CLIENT_SECRET:-}
+      - NUXT_PUBLIC_TWITCH_CLIENT_REDIRECT=${TWITCH_CLIENT_REDIRECT:-}
     container_name: app
     restart: always
     networks:

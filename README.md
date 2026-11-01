@@ -87,6 +87,30 @@ Voici les étapes à suivre pour se connecter en tant qu'administrateur :
 
 4. Ensuite, exécuter `npx prisma studio` pour vérifier que l'utilisateur a bien été créé.
 
+  
+## Variables d'environnement
+
+Elles se règlent dans le fichier `.env` (modèle : `.env.example`) :
+
+| Variable | Rôle |
+| --- | --- |
+| `JWT_SECRET` | Secret de signature des jetons de session |
+| `ADMIN_NAME`, `ADMIN_PASSWORD` | Compte administrateur créé par `node prisma/seed.js` (mot de passe en clair, haché par le seed) |
+| `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, `DISCORD_CLIENT_REDIRECT` | Application Discord pour la connexion Discord (l'URL de redirection doit être déclarée à l'identique chez Discord) |
+| `TWITCH_CLIENT_ID`, `TWITCH_CLIENT_SECRET`, `TWITCH_CLIENT_REDIRECT` | Idem pour Twitch |
+
+Nuxt ne prend dans sa configuration que les variables `NUXT_*` : `docker-compose.yml` recopie donc les variables `DISCORD_*` et `TWITCH_*` vers les variables `NUXT_*` (`NUXT_PUBLIC_DISCORD_CLIENT_ID`, `NUXT_DISCORD_CLIENT_SECRET`, etc.) que Nuxt lit au démarrage. Les secrets restent côté serveur : l'échange du code OAuth se fait dans `/api/oauth/discord` et `/api/oauth/twitch`, jamais dans le navigateur.
+
+Si les variables sont gérées dans l'Environment de la stack Komodo, `DISCORD_*` et `TWITCH_*` doivent y figurer : Komodo écrit alors le `.env` lui-même.
+
+## Tests
+
+Aucun appel n'est fait aux vrais services : `tests/fake-oauth.mjs` simule Discord et Twitch (port 4500) et le site tourne sur le port 3000 (les deux doivent être libres). Les scripts ne touchent jamais à `prisma/milestone.db` (le fichier monté par la prod) : ils copient le dépôt dans un dossier temporaire (`mktemp -d`, sans la base, `.output`, `.nuxt`, `.env` ni `tests/.tmp`; `node_modules` y est copié pour de bon, 300 Mo environ, son contenu est recopié même si `node_modules` est un lien symbolique, jamais relié, sinon `prisma generate` réécrirait le client du vrai dépôt ; `rsync` est requis), puis migrent, remplissent la base de test, construisent et testent dans cette copie, supprimée à la sortie. Deux lancements ne se gênent donc pas sur les fichiers ; ils se refusent seulement si les ports 3000 ou 4500 sont déjà pris. Après un `kill -9`, il reste un dossier orphelin dans `/tmp` (environ 350 Mo : `node_modules` et `.output`), jamais dans le dépôt : à supprimer à la main (`/tmp/tmp.*`).
+
+- `bash tests/run-local.sh` : build, base de test, faux OAuth, serveur Nitro, puis `tests/api.test.mjs` (Node 20+, `rsync` installé).
+- `bash tests/run-docker.sh` : même chose avec l'image Docker, via `tests/compose.test.yml` et `tests/test.env` (valeurs factices qui testent l'interpolation de `docker-compose.yml`), projet `millstone-test`, conteneur `app-test`, sans traefik.
+- `tests/browser.mjs` : parcours navigateur Playwright. Il tourne à la suite des deux scripts ci-dessus si la variable `PW_DIR` (dossier où Playwright est installé : `package.json` et `node_modules/playwright`) est définie (les captures vont dans `SHOTS`, par défaut un dossier `mktemp -d` affiché en fin de run, conservé après la sortie) ; il peut aussi être lancé seul contre un site déjà démarré (`BASE_URL`, par défaut `http://127.0.0.1:3000`, dont la redirect attendue est déduite).
+
 ## Installation sur un serveur de production (PROD)
 
 Après la connexion au serveur d'hébergement, suivez ces étapes pour installer le projet :
@@ -147,9 +171,9 @@ Une fois le compte créé, `ADMIN_PASSWORD` n'est plus lu et peut être retiré 
 ```bash
 
 cd /usr/local/src/Unitystation-MillstoneSteam/
-docker down
+docker compose down
 git pull
-docker up
+docker compose up -d --build
 ```
 
 ### Migrations en production
