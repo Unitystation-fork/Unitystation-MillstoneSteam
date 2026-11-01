@@ -62,6 +62,7 @@ const editUser = defineEventHandler(async (event) => {
         role: (role) ? role : userToEdit.role,
         updatedAt: new Date(),
       },
+      select: publicUserFields,
     });
     return {
       statusCode: 200,

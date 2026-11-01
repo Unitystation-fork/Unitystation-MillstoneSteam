@@ -45,13 +45,7 @@ const users = defineEventHandler(async (event) => {
     }
     // get all users from the database and return them
     const users = await prisma.user.findMany({
-      select: {
-        name: true,
-        id: true,
-        role: true,
-        discordId: true,
-        twitchId: true,
-      }
+      select: publicUserFields,
     });
     return {
       statusCode: 200,
