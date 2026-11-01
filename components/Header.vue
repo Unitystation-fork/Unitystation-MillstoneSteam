@@ -38,7 +38,7 @@
     </p>
 
     <div class="btns" v-if="!jwtStore.jwt">
-      <a href="https://vu.fr/mGJw" target="_blank">
+      <a href="https://forms.gle/kcwuM2f92sxL8Pbn9" target="_blank">
         <button @click="hideCreateButton">Create account</button>
       </a>
     </div>
