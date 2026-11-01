@@ -38,7 +38,7 @@
           <a
             href="#"
             class="oauth-button discord"
-            @click="redirectToDiscordOAuth"
+            @click.prevent="startOAuth('discord')"
           >
             <img src="../assets/img/discord-icon.png" alt="Discord Icon" />
             Se connecter avec Discord
@@ -46,7 +46,7 @@
           <a
             href="#"
             class="oauth-button twitch"
-            @click="redirectToTwitchOAuth"
+            @click.prevent="startOAuth('twitch')"
           >
             <img src="../assets/img/twitch-icon.png" alt="Twitch Icon" />
             Se connecter avec Twitch
@@ -61,19 +61,15 @@
 
 <script setup>
 import { useJwtStore } from "~~/stores/jwt";
-import { useUserStore } from "~~/stores/user"; // Update the import path as needed
-import { useDiscordStore } from "~~/stores/discord";
 import { useTaskStore } from "~~/stores/task";
 import { onMounted } from "vue";
 
-const userStore = useUserStore();
 const taskStore = useTaskStore();
 const username = ref("");
 const password = ref("");
 const error = ref("");
 const emit = defineEmits(["close"]);
 const jwtStore = useJwtStore();
-const runtimeConfig = useRuntimeConfig();
 
 defineProps({
   showForm: {
@@ -82,79 +78,93 @@ defineProps({
   },
 });
 
-// This function is called when the component is mounted
+const UNKNOWN_USER_MESSAGE = (service) =>
+  `Utilisateur ${service} inconnu, veuillez envoyer un e-mail à <contact.unionrolistes@gmail.com> pour vous ajouter à la liste invitation.`;
+
+// Au retour de Discord/Twitch (?code=...&service=...&state=...), le code est envoyé
+// au serveur, qui l'échange lui-même : le secret OAuth ne passe jamais par le navigateur.
 onMounted(async () => {
-  // Create a new URLSearchParams object with the query string of the current URL
-  const urlParams = new URLSearchParams(window.location.search);
+  const { code, service, state, error: oauthError } = Object.fromEntries(
+    new URLSearchParams(window.location.search)
+  );
+  if (service !== "discord" && service !== "twitch") return;
 
-  // Get the value of the "code" parameter from the URL
-  const code = urlParams.get("code");
+  // L'utilisateur a refusé l'autorisation chez le fournisseur (?error=access_denied...).
+  if (!code) {
+    if (!oauthError) return;
+    sessionStorage.removeItem("oauth_state");
+    alert("Connexion annulée.");
+    await navigateTo("/", { replace: true });
+    return;
+  }
 
-  // Get the value of the "service" parameter from the URL
-  const service = urlParams.get("service");
+  const expected = sessionStorage.getItem("oauth_state");
+  sessionStorage.removeItem("oauth_state");
+  if (!state || state !== expected) {
+    alert("Session de connexion invalide ou expirée, veuillez réessayer.");
+    await navigateTo("/", { replace: true });
+    return;
+  }
 
-  // If a code is present in the URL parameters
-  if (code) {
-    // If the service is "discord"
-    if (service === "discord") {
-      // Handle the OAuth redirect for Discord with the provided code
-      await handleDiscordOAuthRedirect(code);
-    }
-    // If the service is "twitch"
-    else if (service === "twitch") {
-      // Handle the OAuth redirect for Twitch with the provided code
-      await handleTwitchOAuthRedirect(code);
-    }
+  const res = await fetch(apiUrl(`/api/oauth/${service}`), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ code }),
+  })
+    .then((r) => r.json())
+    .catch(() => null);
+
+  if (res?.statusCode === 200) {
+    jwtStore.setJwt(res.body.token);
+    jwtStore.setRole(res.body.role);
+    // le contenu privé n'est envoyé qu'une fois connecté
+    await taskStore.setTasks();
+    alert("Votre connexion est réussie");
+    await navigateTo("/", { replace: true });
+    emit("close");
+  } else {
+    const label = service === "discord" ? "Discord" : "Twitch";
+    alert(
+      res?.statusCode === 401 && /inconnu/.test(res.message || "")
+        ? UNKNOWN_USER_MESSAGE(label)
+        : res?.message || "Connexion impossible."
+    );
+    await navigateTo("/", { replace: true });
   }
 });
 
-// login handles two types of connections: administrator login requires a username and a password,
-// users via discord oAuth are ordinary users and do not require a password
-const login = async (isAdmin = true) => {
-  //If it is an admin login, the username and password are required.
-  //If it is a third-party oauth login, the password is not required.
-  if (isAdmin) {
-    if (username.value.length === 0 || password.value.length === 0) {
-      error.value = "Veuillez remplir tous les champs";
-      return;
-    }
-  } else {
-    if (username.value.length === 0) {
-      error.value = "Veuillez remplir le nom";
-      return;
-    }
+// Connexion administrateur : nom d'utilisateur et mot de passe.
+const login = async () => {
+  if (username.value.length === 0 || password.value.length === 0) {
+    error.value = "Veuillez remplir tous les champs";
+    return;
   }
-  const data = isAdmin
-    ? {
-        name: username.value,
-        password: password.value,
-      }
-    : {
-        name: username.value,
-      };
   const res = await fetch(apiUrl("/api/login"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(data),
+    body: JSON.stringify({
+      name: username.value,
+      password: password.value,
+    }),
   })
     .then((r) => r.json())
     .catch((e) => {
       error.value = e.message;
       console.log(e);
+      return null;
     });
-  if (res.statusCode === 200) {
+  if (res?.statusCode === 200) {
     jwtStore.setJwt(res.body.token);
     jwtStore.setRole(res.body.role);
-    // the private contents are only sent once the user is logged in
+    // le contenu privé n'est envoyé qu'une fois connecté
     await taskStore.setTasks();
-    //redirect to home page from discord callback address
     alert("Votre connexion est réussie");
     await navigateTo("/");
     emit("close");
   } else if (res) {
-    error.value = res.statusMessage;
+    error.value = res.message || res.statusMessage || "Connexion impossible.";
   }
 };
 
@@ -162,205 +172,34 @@ const handleChange = () => {
   error.value = "";
 };
 
-const redirectToDiscordOAuth = async () => {
-  const discordClientId = runtimeConfig.discordClientId;
-  const discordRedirectUri = runtimeConfig.discordClientRedirect;
-  const discordOAuthUrl = `https://discord.com/oauth2/authorize?response_type=code&client_id=${discordClientId}&scope=identify&state=someUniqueState&redirect_uri=${discordRedirectUri}`;
-
-  if (process.client) {
-    window.location.href = discordOAuthUrl;
-  }
-};
-
-const exchangeCodeForAccessToken = async (code) => {
-  if (process.client) {
-    const discordClientId = runtimeConfig.discordClientId;
-    const discordClientSecret = runtimeConfig.discordClientSecret;
-    const discordRedirectUri = runtimeConfig.discordClientRedirect;
-
-    const tokenRequestData = new URLSearchParams();
-    tokenRequestData.append("grant_type", "authorization_code");
-    tokenRequestData.append("code", code);
-    tokenRequestData.append("redirect_uri", discordRedirectUri);
-
-    const tokenResponse = await fetch("https://discord.com/api/oauth2/token", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Authorization: `Basic ${btoa(
-          `${discordClientId}:${discordClientSecret}`
-        )}`,
-      },
-      body: tokenRequestData.toString(),
-    });
-
-    if (tokenResponse.ok) {
-      const tokenData = await tokenResponse.json(); // Read the JSON response only once
-
-      const accessToken = tokenData.access_token;
-
-      // Now that you have the access token, use it to get user information
-      const userResponse = await fetch("https://discord.com/api/users/@me", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      if (userResponse.ok) {
-        const discordUser = await userResponse.json();
-
-        return discordUser; // Return the user information
-      }
-    }
-  }
-};
-
-// This function handles the OAuth redirect for Discord
-const handleDiscordOAuthRedirect = async (code) => {
-  // Check if the process is client-side
-  if (process.client) {
-    try {
-      // Exchange the code for an access token and get the Discord user
-      const discordUser = await exchangeCodeForAccessToken(code);
-
-      // If the Discord user exists
-      if (discordUser) {
-        // Get the username of the Discord user
-        const discordId = discordUser.username;
-
-        // Check if the Discord user exists in the user store
-        const res = await userStore.checkThirdPartyUserExistence(discordId);
-
-        // If the user exists (status code 200)
-        if (res.statusCode == 200) {
-          console.log("Utilisateur Discord trouvé");
-
-          // Set the username value to the Discord ID
-          username.value = discordId;
-
-          // Clear the password value
-          password.value = "";
-
-          // Log in the user, Discord user does not need a password
-          login(false);
+// Redirige vers la page d'autorisation du fournisseur, avec un state aléatoire
+// (vérifié au retour) contre les requêtes forgées.
+const startOAuth = (service) => {
+  const pub = useRuntimeConfig().public;
+  const state = crypto.randomUUID();
+  sessionStorage.setItem("oauth_state", state);
+  const p =
+    service === "discord"
+      ? {
+          url: "https://discord.com/oauth2/authorize",
+          client_id: pub.discordClientId,
+          redirect_uri: pub.discordClientRedirect,
+          scope: "identify",
         }
-        // If the user does not exist (status code 400)
-        else if (res.statusCode == 400) {
-          console.error("Utilisateur Discord inconnu");
-
-          // Alert the user that they are unknown and need to email the admin
-          alert(
-            "Utilisateur Discord inconnu, veuillez envoyer un e-mail à <contact.unionrolistes@gmail.com> pour vous ajouter à la liste invitation."
-          );
-
-          // Navigate to the home page
-          await navigateTo("/");
-        }
-      } else {
-        console.error(
-          "Impossible de récupérer les informations de l'utilisateur"
-        );
-      }
-    } catch (e) {
-      console.error("Discord OAuth Redirect error");
-    }
-  }
-};
-
-// Twitch Connect Button function: Twitch oAuth Redirect
-const redirectToTwitchOAuth = () => {
-  const twitchClientId = runtimeConfig.twitchClientId;
-  const twitchRedirectUri = runtimeConfig.twitchClientRedirect;
-  const twitchOAuthUrl = `https://id.twitch.tv/oauth2/authorize?client_id=${twitchClientId}&redirect_uri=${twitchRedirectUri}&response_type=code&scope=openid`;
-
-  if (process.client) {
-    window.location.href = twitchOAuthUrl;
-  }
-};
-// handleTwitchOAuthRedirect: get user's information and login
-const handleTwitchOAuthRedirect = async (code) => {
-  // Check if the process is client-side
-  if (process.client) {
-    // Get the Twitch client ID, client secret, and redirect URI from the runtime config
-    const clientId = runtimeConfig.twitchClientId;
-    const clientSecret = runtimeConfig.twitchClientSecret;
-    const redirectUri = runtimeConfig.twitchClientRedirect;
-
-    try {
-      // Make a POST request to the Twitch OAuth2 token endpoint to exchange the code for an access token
-      const response = await fetch("https://id.twitch.tv/oauth2/token", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams({
-          client_id: clientId,
-          client_secret: clientSecret,
-          code: code,
-          grant_type: "authorization_code",
-          redirect_uri: redirectUri,
-        }),
-      });
-
-      // Parse the response as JSON
-      const data = await response.json();
-
-      // Get the access token from the response data
-      const accessToken = data.access_token;
-
-      // Make a GET request to the Twitch users endpoint to get the user info associated with the access token
-      const userInfoResponse = await fetch(
-        "https://api.twitch.tv/helix/users",
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Client-Id": clientId,
-          },
-        }
-      );
-
-      // Parse the user info response as JSON
-      const userInfo = await userInfoResponse.json();
-
-      // Get the user ID from the user info data
-      const userId = userInfo.data[0].login;
-
-      // If the user ID exists
-      if (userId) {
-        // Check if the user exists in the user store
-        const res = await userStore.checkThirdPartyUserExistence(userId);
-
-        // If the user exists (status code 200)
-        if (res.statusCode == 200) {
-          console.log("Twitch Utilisateur trouvé");
-
-          // Set the username value to the user ID and clear the password value
-          username.value = userId;
-          password.value = "";
-
-          // Log in the user
-          login(false);
-        }
-        // If the user does not exist (status code 400)
-        else if (res.statusCode == 400) {
-          console.error("Twitch Utilisateur inconnu");
-
-          // Alert the user that they are unknown and need to email the admin
-          alert(
-            "Utilisateur Twitch inconnu, veuillez envoyer un e-mail à <contact.unionrolistes@gmail.com> pour vous ajouter à la liste invitation."
-          );
-
-          // Navigate to the home page
-          await navigateTo("/");
-        }
-      } else {
-        console.error("Unable to retrieve user information");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  }
+      : {
+          url: "https://id.twitch.tv/oauth2/authorize",
+          client_id: pub.twitchClientId,
+          redirect_uri: pub.twitchClientRedirect,
+          scope: "openid",
+        };
+  const query = new URLSearchParams({
+    response_type: "code",
+    client_id: p.client_id,
+    redirect_uri: p.redirect_uri,
+    scope: p.scope,
+    state,
+  });
+  window.location.href = `${p.url}?${query}`;
 };
 </script>
 

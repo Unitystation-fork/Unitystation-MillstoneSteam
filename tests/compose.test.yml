@@ -1,0 +1,29 @@
+# Surcharge de test pour docker-compose.yml (voir tests/run-docker.sh) : même image, mais
+# sans traefik ni réseau externe, base de test dédiée, publiée sur 127.0.0.1:3000 et branchée
+# sur le faux serveur OAuth de l'hôte (tests/fake-oauth.mjs, port 4500). Rejouable, sans
+# toucher au conteneur « app » ni à prisma/milestone.db de la prod.
+# Commande : docker compose -p millstone-test --env-file tests/test.env \
+#   -f docker-compose.yml -f tests/compose.test.yml up -d --build
+# Les DISCORD_*/TWITCH_* viennent de tests/test.env (interpolation du compose de base).
+services:
+  app:
+    container_name: app-test
+    restart: "no"
+    labels: !reset []
+    networks: !reset [default]
+    env_file: !reset []
+    ports:
+      - "127.0.0.1:3000:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./tests/.tmp/milestone.db:/app/.output/server/prisma/milestone.db
+    environment:
+      - JWT_SECRET=test-jwt-secret
+      - NUXT_PUBLIC_API_BASE=http://127.0.0.1:3000
+      - NUXT_OAUTH_DISCORD_API_BASE=http://host.docker.internal:4500
+      - NUXT_OAUTH_TWITCH_ID_BASE=http://host.docker.internal:4500
+      - NUXT_OAUTH_TWITCH_API_BASE=http://host.docker.internal:4500
+
+networks:
+  traefik-public: !reset null
