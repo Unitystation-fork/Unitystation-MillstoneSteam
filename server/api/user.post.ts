@@ -62,6 +62,7 @@ const createUser = defineEventHandler(async (event) => {
         discordId: discordId,
         twitchId: twitchId,
       },
+      select: publicUserFields,
     });
     return {
       statusCode: 200,

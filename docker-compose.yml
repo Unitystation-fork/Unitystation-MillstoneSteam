@@ -26,6 +26,8 @@ services:
       target: build
     profiles:
       - migrate
+    env_file:
+      - .env
     command: npx prisma migrate deploy
     volumes:
       - ./prisma/milestone.db:/app/prisma/milestone.db

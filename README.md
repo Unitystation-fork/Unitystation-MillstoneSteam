@@ -76,19 +76,16 @@ Pour accéder à l'aperçu de la version de production, visitez http://milestone
 Voici les étapes à suivre pour se connecter en tant qu'administrateur :
 
 
-1. Copier le fichier `.default` en `.env` avec la commande `cp .default .env` puis le remplir avec un nom d'utilisateur et un mot de passe admin.
+1. Copier le fichier d'exemple avec la commande `cp .env.example .env` puis le remplir avec un nom d'utilisateur, un mot de passe admin en clair et un `JWT_SECRET`.
 
 
-2.  `node prisma/seed.js` pour injecter les données dans la base de données.
+2. Exécuter la commande `npx prisma migrate deploy` pour créer la base de données.
 
-  
-3. Exécuter la commande `npx prisma generate` pour générer cet utilisateur avec le rôle admin.
 
-  
+3. `npx prisma db seed` pour injecter les données dans la base de données, dont cet utilisateur avec le rôle admin. Son mot de passe est haché avant d'être écrit.
+
+
 4. Ensuite, exécuter `npx prisma studio` pour vérifier que l'utilisateur a bien été créé.
-
-  
-5. Retirer le `await` de la fonction `bcrypt.compare` dans le fichier `login.post.ts` situé dans le dossier `\server\api\`.
 
 ## Installation sur un serveur de production (PROD)
 
@@ -135,11 +132,15 @@ sudo systemctl enable containerd.service
 cd /usr/local/src
 git clone https://github.com/Unitystation-fork/Unitystation-MillstoneSteam.git
 cd ./Unitystation-MillstoneSteam
-cp .default .env
-nano .env # Mettez à jour les valeurs (le mot de passe doit être au format bcrypt. Vous pouvez convertir votre mot de passe en hash bcrypt ici : https://www.bcrypt.fr/)
-node seed.js # Pour peupler la base de données avec l'utilisateur Administrateur que vous avez indiquez dans .env
-docker compose up
+cp .env.example .env
+nano .env # Mettez à jour les valeurs (le mot de passe s'écrit en clair, il est haché avant d'être écrit en base)
+touch prisma/milestone.db
+docker compose --profile migrate run --build --rm migrate
+docker compose --profile migrate run --rm migrate npx prisma db seed # Pour peupler la base de données avec l'utilisateur Administrateur que vous avez indiqué dans .env
+docker compose up -d --build app
 ```
+
+Une fois le compte créé, `ADMIN_PASSWORD` n'est plus lu et peut être retiré de `.env`.
 
 ### Mise à jour du projet (après une nouvelle version) :
 
